@@ -1,0 +1,23 @@
+[[source]]
+url = "https://pypi.org/simple"
+verify_ssl = true
+name = "pypi"
+
+[packages]
+fastapi = "*"
+uvicorn = {extras = ["standard"], version = "*"}
+pymongo = "*"
+redis = "*"
+gunicorn = "*"
+firebase-admin = "*"
+dependency-injector = "*"
+cryptography = "*"
+pyjwt = "*"
+bcrypt = "*"
+blinker = "*"
+python-multipart = "*"
+
+[dev-packages]
+
+[requires]
+python_version = "3.10"

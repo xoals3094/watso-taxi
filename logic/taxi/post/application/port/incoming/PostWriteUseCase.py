@@ -1,18 +1,24 @@
 from abc import *
-from logic.taxi.post.dto.presentation import PostWriteModel
+from datetime import datetime
 
 
 class PostWriteUseCase(metaclass=ABCMeta):
     @abstractmethod
-    def create(self, user_id, post: PostWriteModel) -> str:
+    def create(self,
+               owner_id: str,
+               depart_point_id: str,
+               arrive_point_id: str,
+               depart_datetime: datetime,
+               max_member: int,
+               notice: str) -> str:
         pass
 
     @abstractmethod
-    def delete(self, post_id, handling_user_id):
+    def delete(self, post_id, user_id):
         pass
 
     @abstractmethod
-    def modify(self, user_id, post_id, patch_dict):
+    def modify(self, user_id, post_id, notice):
         pass
 
     @abstractmethod
@@ -20,9 +26,9 @@ class PostWriteUseCase(metaclass=ABCMeta):
         pass
 
     @abstractmethod
-    def join(self, post_id, user_id, nickname, order_json):
+    def join(self, user_id, post_id):
         pass
 
     @abstractmethod
-    def quit(self, post_id, user_id):
+    def quit(self, user_id, post_id):
         pass

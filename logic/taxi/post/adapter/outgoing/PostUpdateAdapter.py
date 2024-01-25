@@ -5,26 +5,19 @@ from bson import ObjectId
 
 class MongoDBPostUpdateDao(PostUpdateDao):
     def __init__(self, mongodb_connection):
-        self.db = mongodb_connection['taxi']
+        self.db = mongodb_connection['watso']
+
+    def update(self, post: Post):
+        find = {'_id': ObjectId(post.id)}
+        update = {'$set': {'notice': post.notice}}
+        self.db.post.update_one(find, update)
 
     def update_status(self, post: Post):
         find = {'_id': ObjectId(post.id)}
         update = {'$set': {'status': post.status}}
         self.db.post.update_one(find, update)
 
-    def update_content(self, post: Post):
+    def update_members(self, post: Post):
         find = {'_id': ObjectId(post.id)}
-        update = {
-            '$set': {
-                'depart_time': post.depart_time,
-                'max_member': post.max_member,
-                'content': post.content
-            }
-        }
-        self.db.post.update_one(find, update)
-
-    def update_users(self, post: Post):
-        find = {'_id': ObjectId(post._id)}
-        update = {'$set': {'users': post.users}}
-
+        update = {'$set': {'member.members': [ObjectId(member) for member in post.member.members]}}
         self.db.post.update_one(find, update)

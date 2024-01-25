@@ -1,31 +1,12 @@
 from abc import *
+from logic.auth.domain.User import User
 
 
 class UserDao(metaclass=ABCMeta):
     @abstractmethod
-    def is_already_exist_username(self, username) -> bool:
+    def find_user_by_kakao_id(self, kakao_id) -> User | None:
         pass
 
     @abstractmethod
-    def is_already_exist_nickname(self, nickname) -> bool:
-        pass
-
-    @abstractmethod
-    def is_already_exist_email(self, email) -> bool:
-        pass
-
-    @abstractmethod
-    def update_pw(self, user_id, pw):
-        pass
-
-    @abstractmethod
-    def update_email(self, user_id, email):
-        pass
-
-    @abstractmethod
-    def update_nickname(self, user_id, nickname):
-        pass
-
-    @abstractmethod
-    def update_account_number(self, user_id, account_number):
+    def create(self, nickname, profile_image_url, kakao_id) -> User:
         pass

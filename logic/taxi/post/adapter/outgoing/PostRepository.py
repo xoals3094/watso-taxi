@@ -7,8 +7,7 @@ from logic.taxi.post.application.port.outgoing.PostRepository import PostReposit
 
 class MongoDBPostRepository(PostRepository):
     def __init__(self, mongodb_connection):
-        self.db = mongodb_connection['taxi']
-        self.user_db = mongodb_connection['auth']
+        self.db = mongodb_connection['watso']
 
     def find_post_by_id(self, post_id: str) -> Post:
         find = {'_id': ObjectId(post_id)}
@@ -19,22 +18,38 @@ class MongoDBPostRepository(PostRepository):
         return PostMapper.post_mapping(post_json)
 
     def save(self, post: Post):
-        find = {'_id': ObjectId(post.user_id)}
-        user = self.user_db.user.find_one(find)
-        nickname = user['nickname']
+        find = {'_id': ObjectId(post.owner_id)}
+        user = self.db.user.find_one(find)
+        find = {'_id': ObjectId(post.point.depart_point_id)}
+        depart_point = self.db.point.find_one(find)
+
+        find = {'_id': ObjectId(post.point.arrive_point_id)}
+        arrive_point = self.db.point.find_one(find)
 
         data = {
             '_id': ObjectId(post.id),
-            'user': {
-                '_id': ObjectId(post.user_id),
-                'nickname': nickname
+            'owner': {
+                '_id': user['_id'],
+                'nickname': user['nickname']
             },
+            'point': {
+                'depart_point': {
+                    '_id': depart_point['_id'],
+                    'name': depart_point['name']
+                },
+                'arrive_point': {
+                    '_id': arrive_point['_id'],
+                    'name': arrive_point['name']
+                }
+            },
+            'depart_datetime': post.depart_datetime,
             'status': post.status,
-            'direction': post.direction,
-            'depart_time': post.depart_time,
-            'max_member': post.max_member,
-            'content': post.content,
-            'users': [ObjectId(user_id) for user_id in post.users]
+            'fee': post.fee,
+            'member': {
+                'max_member': post.member.max_member,
+                'members': [ObjectId(member) for member in post.member.members]
+            },
+            'notice': post.notice,
         }
         self.db.post.insert_one(data)
 

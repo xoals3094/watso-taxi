@@ -3,7 +3,7 @@ from enum import Enum
 
 class Status(str, Enum):
     RECRUITING = 'RECRUITING'
-    CLOSE = 'CLOSE'
+    CLOSE = 'CLOSED'
     BOARDING = 'BOARDING'
     SETTLE = 'SETTLE'
     COMPLETION = 'COMPLETION'

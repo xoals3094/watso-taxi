@@ -3,9 +3,9 @@ from pymongo import MongoClient
 from config.production import mongodb
 
 
-from logic.auth.adapter.outgoing.UserRepository import MongoDBUserRepository
-from logic.auth.adapter.outgoing.TokenAdapter import MongoDBTokenDao
-from logic.auth.application.AuthService import JwtAuthService
+from logic.auth.adapter.outgoing.UserAdapter import MongoDBUserDao
+from logic.auth.application.KakaoLoginService import KakaoLoginService
+from logic.auth.adapter.outgoing.KakaoApiAdapter import ApiKakaoAdapter
 
 
 class AuthContainer(containers.DeclarativeContainer):
@@ -14,14 +14,13 @@ class AuthContainer(containers.DeclarativeContainer):
     mongodb_connection = providers.Singleton(
         MongoClient,
         host=mongodb.host,
-        username=mongodb.username,
-        password=mongodb.password,
+        #username=mongodb.username,
+        #password=mongodb.password,
         port=mongodb.port,
         connect=False
     )
 
-    user_repository = providers.Singleton(MongoDBUserRepository, mongodb_connection=mongodb_connection)
-    token_dao = providers.Singleton(MongoDBTokenDao, mongodb_connection=mongodb_connection)
+    kakao_dao = providers.Singleton(ApiKakaoAdapter)
+    user_dao = providers.Singleton(MongoDBUserDao, mongodb_connection=mongodb_connection)
 
-    auth_service = providers.Singleton(JwtAuthService, user_repository=user_repository, token_dao=token_dao)
-
+    kakao_service = providers.Singleton(KakaoLoginService, kakao_dao=kakao_dao, user_dao=user_dao)

@@ -1,58 +1,30 @@
-from logic.user.application.port.outgoing.UserDao import UserDao
+from logic.auth.application.port.outgoing.UserDao import UserDao
+from logic.auth.domain.User import User
 
 
 class MongoDBUserDao(UserDao):
     def __init__(self, mongodb_connection):
-        self.db = mongodb_connection['auth']
+        self.db = mongodb_connection['watso']
 
-    def is_already_exist_username(self, username) -> bool:
-        find = {'username': username}
+    def find_user_by_kakao_id(self, kakao_id) -> User | None:
+        find = {
+            'kakao.id': kakao_id
+        }
         user_json = self.db.user.find_one(find)
-        return user_json is not None
+        if user_json is None:
+            return
 
-    def is_already_exist_nickname(self, nickname) -> bool:
-        find = {'nickname': nickname}
-        user_json = self.db.user.find_one(find)
-        return user_json is not None
+        return User(id=str(user_json['_id']), nickname=user_json['nickname'], profile_image_url=user_json['profile_image_url'])
 
-    def is_already_exist_email(self, email) -> bool:
-        find = {'email': email}
-        user_json = self.db.user.find_one(find)
-        return user_json is not None
+    def create(self, nickname, profile_image_url, kakao_id) -> User:
+        data = {
+            'nickname': nickname,
+            'profile_image_url': profile_image_url,
+            'kakao': {
+                'id': kakao_id
+            }
+        }
 
-    def update_pw(self, user_id, pw):
-        find = {'_id': user_id}
-        update = {'$set': {'pw': pw}}
-        self.db.user.update_many(find, update)
+        id = self.db.user.insert_one(data)
 
-        find = {'user._id': user_id}
-        update = {'$set': {'user.pw': pw}}
-        self.db.token.update_many(find, update)
-
-    def update_email(self, user_id, email):
-        find = {'_id': user_id}
-        update = {'$set': {'email': email}}
-        self.db.user.update_many(find, update)
-
-        find = {'user._id': user_id}
-        update = {'$set': {'user.email': email}}
-        self.db.token.update_many(find, update)
-
-    def update_nickname(self, user_id, nickname):
-        find = {'_id': user_id}
-        update = {'$set': {'nickname': nickname}}
-        self.db.user.update_many(find, update)
-
-        find = {'user._id': user_id}
-        update = {'$set': {'user.nickname': nickname}}
-        self.db.token.update_many(find, update)
-
-    def update_account_number(self, user_id, account_number):
-        find = {'_id': user_id}
-        update = {'$set': {'account_number': account_number}}
-        self.db.user.update_many(find, update)
-
-        find = {'user._id': user_id}
-        update = {'$set': {'user.account_number': account_number}}
-        self.db.token.update_many(find, update)
-
+        return User(id=str(id), nickname=nickname, profile_image_url=nickname)

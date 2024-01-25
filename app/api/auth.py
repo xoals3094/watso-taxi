@@ -1,9 +1,10 @@
-from fastapi.security import OAuth2PasswordBearer
 from fastapi import Depends
 import jwt
 from config.production.setting import secret_key
+from fastapi.security.api_key import APIKeyHeader
 
-oauth = OAuth2PasswordBearer(tokenUrl='/auth/login')
+
+oauth2_scheme = APIKeyHeader(name='Authorization')
 
 
 def decode_token(token):
@@ -11,6 +12,6 @@ def decode_token(token):
     return payload
 
 
-def get_user_id(token: str = Depends(oauth)):
+def get_user_id(token=Depends(oauth2_scheme)):
     data = decode_token(token)
-    return data['user_id']
+    return data['id']

@@ -131,7 +131,7 @@ async def update_status(req: RequestChangeStatusModel,
     post_use_case.change_status(user_id, post_id, req.status)
 
 
-@post_router.post('/{post_id}/member')
+@post_router.post('/{post_id}/member', tags=['post'])
 @inject
 async def join(post_id: str,
                user_id: str = Depends(get_user_id),
@@ -139,7 +139,7 @@ async def join(post_id: str,
     post_use_case.join(user_id, post_id)
 
 
-@post_router.delete('/{post_id}/member')
+@post_router.delete('/{post_id}/member', tags=['post'])
 @inject
 async def quit(post_id: str,
                user_id: str = Depends(get_user_id),

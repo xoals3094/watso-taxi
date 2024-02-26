@@ -26,9 +26,9 @@ class PostWriteUseCase(metaclass=ABCMeta):
         pass
 
     @abstractmethod
-    def join(self, user_id, post_id):
+    def participate(self, user_id, post_id):
         pass
 
     @abstractmethod
-    def quit(self, user_id, post_id):
+    def leave(self, user_id, post_id):
         pass

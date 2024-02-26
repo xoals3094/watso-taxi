@@ -6,8 +6,6 @@ from logic.taxi.post.application.port.outgoing.PostUpdateDao import PostUpdateDa
 
 from logic.taxi.post.domain.Post import Post
 
-import exceptions
-
 
 class PostWriteService(PostWriteUseCase):
     def __init__(self, post_repository: PostRepository, post_update_dao: PostUpdateDao):
@@ -31,48 +29,27 @@ class PostWriteService(PostWriteUseCase):
         return post.id
 
     def delete(self, post_id, user_id):
-        try:
-            post = self.post_repository.find_post_by_id(post_id)
-        except exceptions.NotExistPost:
-            raise exceptions.NotExistPost
-
-        post.can_delete(user_id)
+        post = self.post_repository.find_post_by_id(post_id)
         self.post_repository.delete(post.id)
 
     def modify(self, user_id, post_id, notice):
-        try:
-            post = self.post_repository.find_post_by_id(post_id)
-        except exceptions.NotExistResource:
-            raise exceptions.NotExistPost
-
-        post.modify(notice=notice)
+        post = self.post_repository.find_post_by_id(post_id)
+        post.modify(user_id=user_id, notice=notice)
 
         self.post_update_dao.update(post)
 
     def change_status(self, user_id, post_id, status):
-        try:
-            post = self.post_repository.find_post_by_id(post_id)
-        except exceptions.NotExistResource:
-            raise exceptions.NotExistPost
-
-        post.change_status(status)
+        post = self.post_repository.find_post_by_id(post_id)
+        post.change_status(user_id=user_id, status=status)
         self.post_update_dao.update_status(post)
 
-    def join(self, user_id, post_id):
-        try:
-            post = self.post_repository.find_post_by_id(post_id)
-        except exceptions.NotExistResource:
-            raise exceptions.NotExistPost
-
-        post.join(user_id)
+    def participate(self, user_id, post_id):
+        post = self.post_repository.find_post_by_id(post_id)
+        post.participate(user_id)
         self.post_update_dao.update_members(post)
 
-    def quit(self, user_id, post_id):
-        try:
-            post = self.post_repository.find_post_by_id(post_id)
-        except exceptions.NotExistResource:
-            raise exceptions.NotExistPost
-
-        post.quit(user_id)
+    def leave(self, user_id, post_id):
+        post = self.post_repository.find_post_by_id(post_id)
+        post.leave(user_id)
         self.post_update_dao.update_members(post)
 

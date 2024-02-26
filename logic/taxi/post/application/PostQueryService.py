@@ -3,7 +3,6 @@ from logic.taxi.post.application.port.incoming.PostQueryUseCase import PostQuery
 from logic.taxi.post.application.port.outgoing.PostQueryDao import PostQueryDao
 from logic.taxi.post.dto.PostSummaryDto import PostSummaryDto
 from logic.taxi.post.dto.PostDetailDto import PostDetailDto
-import exceptions
 
 
 class PostQueryService(PostQueryUseCase):
@@ -14,9 +13,5 @@ class PostQueryService(PostQueryUseCase):
         return self.post_query_dao.find_posts(user_id, depart_point_id, arrive_point_id, depart_datetime)
 
     def get(self, post_id) -> PostDetailDto:
-        try:
-            post = self.post_query_dao.find_post_by_id(post_id)
-        except exceptions.NotExistResource:
-            raise exceptions.NotExistPost
-
+        post = self.post_query_dao.find_post_by_id(post_id)
         return post

@@ -10,10 +10,8 @@ class KakaoLoginService:
         self.kakao_dao = kakao_dao
         self.user_dao = user_dao
 
-    def login(self, authorization_code) -> (str, str):
-        access_token, refresh_token = self.kakao_dao.get_token(authorization_code)
-        kakao_user_info = self.kakao_dao.get_user_info(access_token, refresh_token)
-
+    def login(self, access_token) -> (str, str):
+        kakao_user_info = self.kakao_dao.get_user_info(access_token)
         user = self.user_dao.find_user_by_kakao_id(kakao_user_info.id)
         if user is None:
             user = self.user_dao.create(kakao_user_info.nickname, kakao_user_info.profile_image_url, kakao_user_info.id)

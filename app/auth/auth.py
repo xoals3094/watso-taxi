@@ -16,18 +16,18 @@ class RefreshModel(BaseModel):
     refresh_token: str
 
 
-@auth_router.get('/kakao-login')
+@auth_router.get('/kakao-login', tags=['auth'])
 @inject
-async def login(authorization_code: str, kakao_service: KakaoLoginService = Depends(Provide[AuthContainer.kakao_service])):
+async def login(access_token: str, kakao_service: KakaoLoginService = Depends(Provide[AuthContainer.kakao_service])):
     """로그인"""
-    access_token, refresh_token = kakao_service.login(authorization_code)
+    access_token, refresh_token = kakao_service.login(access_token)
     return {
         'access_token': access_token,
         'refresh_token': refresh_token
     }
 
 
-@auth_router.get('/login/kakao/callback')
+@auth_router.get('/login/kakao/callback', tags=['kakao'])
 async def login_kakao_callback(code: str = None):
     return
 

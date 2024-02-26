@@ -6,7 +6,7 @@ from logic.taxi.post.domain.Status import Status
 from logic.taxi.post.dto.PostSummaryDto import PostSummaryDto
 from logic.taxi.post.dto.PostDetailDto import PostDetailDto
 from logic.taxi.post.application.port.outgoing.PostQueryDao import PostQueryDao
-import exceptions
+from exceptions import PersistenceException
 
 
 class MongoDBPostQueryDao(PostQueryDao):
@@ -20,7 +20,6 @@ class MongoDBPostQueryDao(PostQueryDao):
             'depart_datetime': {'$gte': depart_datetime},
             'status': Status.RECRUITING,
         }
-
         posts_json = self.db.post.find(find).sort("depart_datetime", pymongo.ASCENDING)
         return [PostSummaryDto.mapping(post_json) for post_json in posts_json]
 
@@ -29,6 +28,8 @@ class MongoDBPostQueryDao(PostQueryDao):
         post_json = self.db.post.find_one(find)
 
         if post_json is None:
-            raise exceptions.NotExistPost
+            raise PersistenceException.ResourceNotFoundException(
+                msg=f"게시글 정보를 찾을 수 없습니다 id={post_id}"
+            )
 
         return PostDetailDto.mapping(post_json)

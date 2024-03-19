@@ -3,7 +3,7 @@ from pydantic import BaseModel, Field
 from dependency_injector.wiring import inject, Provide
 from typing import List
 
-from logic.taxi.point.application.port.incoming.PointQueryUseCase import PointQueryUseCase
+from domain.taxi.point.persistance.point_query_dao import MongoDBPointQueryDao
 from src.taxi_container import TaxiContainer
 
 point_router = APIRouter(prefix='/point')
@@ -16,6 +16,6 @@ class PointModel(BaseModel):
 
 @point_router.get('', response_model=List[PointModel], tags=['point'])
 @inject
-async def get_points(point_use_case: PointQueryUseCase = Depends(Provide[TaxiContainer.point_query_service])):
-    points = point_use_case.get_list()
+async def get_points(point_query: MongoDBPointQueryDao = Depends(Provide[TaxiContainer.point_query_dao])):
+    points = point_query.find_points()
     return [point.json for point in points]

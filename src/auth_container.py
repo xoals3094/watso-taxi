@@ -3,9 +3,9 @@ from pymongo import MongoClient
 from config.production import mongodb
 
 
-from logic.auth.adapter.outgoing.UserAdapter import MongoDBUserDao
-from logic.auth.application.KakaoLoginService import KakaoLoginService
-from logic.auth.adapter.outgoing.KakaoApiAdapter import ApiKakaoAdapter
+from domain.auth.adapter.outgoing.UserAdapter import MongoDBUserDao
+from domain.auth.application.KakaoLoginService import KakaoLoginService
+from domain.auth.adapter.outgoing.KakaoApiAdapter import ApiKakaoAdapter
 
 
 class AuthContainer(containers.DeclarativeContainer):

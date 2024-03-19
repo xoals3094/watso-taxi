@@ -2,7 +2,7 @@ from fastapi import APIRouter, Depends
 from pydantic import BaseModel
 from dependency_injector.wiring import inject, Provide
 from src.auth_container import AuthContainer
-from logic.auth.application.KakaoLoginService import KakaoLoginService
+from domain.auth.application.KakaoLoginService import KakaoLoginService
 
 
 auth_router = APIRouter(prefix='/auth')

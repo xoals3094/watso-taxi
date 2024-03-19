@@ -16,8 +16,8 @@ def create_app():
     api = APIRouter(prefix='/api')
 
     taxi_api = APIRouter(prefix='/taxi')
-    from app.api.taxi import post, point
-    taxi_api.include_router(post.post_router)
+    from app.api.taxi import group, point
+    taxi_api.include_router(group.post_router)
     taxi_api.include_router(point.point_router)
 
     from app.auth.auth import auth_router

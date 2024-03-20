@@ -48,12 +48,14 @@ class GroupService:
 
     def modify_notice(self, user_id: str, group_id: str, notice: str):
         group = self.group_repository.find_group_by_id(group_id)
-        group.modify_notice(user_id=user_id, notice=notice)
+        group.check_owner(user_id=user_id)
+        group.modify_notice(notice=notice)
         self.group_update_dao.update_notice(group_id=group.id, notice=group.notice)
 
     def change_status(self, user_id: str, group_id: str, status: Status):
         group = self.group_repository.find_group_by_id(group_id)
-        group.change_status(user_id=user_id, status=status)
+        group.check_owner(user_id)
+        group.change_status(status=status)
         self.group_update_dao.update_status(group_id=group.id, status=group.status)
 
     def participate(self, user_id, group_id):

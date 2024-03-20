@@ -36,10 +36,11 @@ class Group:
         self.member = member
         self.notice = notice
 
-    def modify_notice(self, user_id, notice):
+    def check_owner(self, user_id):
         if self.owner_id != user_id:
             raise AuthenticationException.AccessDeniedException
 
+    def modify_notice(self, notice):
         if not self.status.modifiable():
             raise DomainException.PostModificationFailedException(
                 msg=f"'{self.status}' 상태에서는 게시글의 수정이 불가능합니다."
@@ -47,10 +48,7 @@ class Group:
 
         self.notice = notice
 
-    def change_status(self, user_id, status):
-        if self.owner_id != user_id:
-            raise AuthenticationException.AccessDeniedException
-
+    def change_status(self, status):
         if not self.status.changeable(status):
             raise DomainException.InvalidStateException(
                 msg=f"'{self.status}' -> '{status}'는 허용되지 않는 상태코드 변경입니다."

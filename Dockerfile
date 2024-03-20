@@ -8,4 +8,4 @@ RUN pip install pipenv
 RUN mkdir .venv
 RUN pipenv install
 
-CMD /root/watso/.venv/bin/uvicorn app:create_app --uds /tmp/milvis.sock
+CMD /root/watso/.venv/bin/uvicorn --factory app:create_app --host=0.0.0.0 --port=8000

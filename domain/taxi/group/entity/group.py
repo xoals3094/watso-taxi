@@ -41,26 +41,15 @@ class Group:
             raise AuthenticationException.AccessDeniedException
 
     def modify_notice(self, notice):
-        if not self.status.modifiable():
-            raise DomainException.PostModificationFailedException(
-                msg=f"'{self.status}' 상태에서는 게시글의 수정이 불가능합니다."
-            )
-
+        self.status.modify()
         self.notice = notice
 
     def change_status(self, status):
-        if not self.status.changeable(status):
-            raise DomainException.InvalidStateException(
-                msg=f"'{self.status}' -> '{status}'는 허용되지 않는 상태코드 변경입니다."
-            )
-
+        self.status.to(status)
         self.status = status
 
     def participate(self, user_id):
-        if not self.status.can_participate():
-            raise DomainException.ParticipationFailedException(
-                msg=f"'{self.status}' 상태에서는 참여가 불가능합니다."
-            )
+        self.status.participate()
 
         if len(self.member.members) >= self.member.max_member:
             raise DomainException.ParticipationFailedException(
@@ -75,14 +64,11 @@ class Group:
         self.member.members.append(user_id)
 
     def leave(self, user_id):
+        self.status.leave()
+
         if self.owner_id == user_id:
             raise DomainException.LeaveFailedException(
                 msg=f"대표 유저는 게시글 탈퇴가 불가능합니다."
-            )
-
-        if not self.status.can_leave():
-            raise DomainException.LeaveFailedException(
-                msg=f"'{self.status}' 상태에서는 탈퇴가 불가능합니다."
             )
 
         if user_id not in self.member.members:

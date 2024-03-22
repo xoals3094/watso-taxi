@@ -20,7 +20,7 @@ def create_app():
     taxi_api.include_router(group.post_router)
     taxi_api.include_router(point.point_router)
 
-    from app.auth.auth import auth_router
+    from app.api.auth.auth import auth_router
     api.include_router(auth_router)
     api.include_router(taxi_api)
 

@@ -14,7 +14,7 @@ class KakaoLoginService:
             user_id = self.user_dao.create(kakao_user_info.nickname, kakao_user_info.profile_image_url, kakao_user_info.id)
 
         access_token = TokenGenerator.create_access_token(user_id)
-        refresh_token = TokenGenerator()
+        refresh_token = TokenGenerator.create_refresh_token()
 
         return access_token, refresh_token
 

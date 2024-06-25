@@ -1,16 +1,16 @@
 from typing import List
 from bson import ObjectId
-import pymongo
-from domain.taxi.group.core.status import Status
+from pymysql import connect
+from domain.taxi_group.core.status import Status
 
-from domain.taxi.group.dto.response_group_detail import ResponseGroupDetail
-from domain.taxi.group.dto.response_group_summary import ResponseGroupSummary
+from domain.group.dto.response_group_detail import ResponseGroupDetail
+from domain.group.dto.response_group_summary import ResponseGroupSummary
 from exceptions import PersistenceException
 
 
-class MongoDBGroupQueryDao:
-    def __init__(self, mongodb_connection):
-        self.db = mongodb_connection['watso']
+class MySQLGroupQueryDao:
+    def __init__(self, mysql_connection: connect):
+        self.cursor = mysql_connection.cursor()
 
     def find_groups(self, user_id, depart_point_id, arrive_point_id, depart_datetime) -> List[ResponseGroupDetail]:
         find = {

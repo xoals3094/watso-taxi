@@ -6,7 +6,6 @@ name = "pypi"
 [packages]
 fastapi = "*"
 uvicorn = {extras = ["standard"], version = "*"}
-pymongo = "*"
 redis = "*"
 gunicorn = "*"
 firebase-admin = "*"
@@ -14,8 +13,9 @@ dependency-injector = "*"
 cryptography = "*"
 pyjwt = "*"
 bcrypt = "*"
-blinker = "*"
 python-multipart = "*"
+multipledispatch = "*"
+pymysql = "*"
 
 [dev-packages]
 

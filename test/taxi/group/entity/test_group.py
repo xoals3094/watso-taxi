@@ -2,8 +2,8 @@ import unittest
 from bson import ObjectId
 from datetime import datetime
 from exceptions import AuthenticationException, DomainException
-from domain.taxi.group.entity.group import Group, Point, Member
-from domain.taxi.group.core.status import Status
+from domain.group import Group, Point, Member
+from domain.taxi_group.core.status import Status
 
 
 class GroupCheckOwnerTest(unittest.TestCase):

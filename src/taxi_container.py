@@ -1,31 +1,27 @@
 from dependency_injector import containers, providers
-from pymongo import MongoClient
-from config.production import mongodb
+from pymysql import connect
+from config.production import mysql
 
-from domain.taxi.group.application.group_service import GroupService
-from domain.taxi.group.persistance.repository import MongoDBGroupRepository
-from domain.taxi.group.persistance.group_query_dao import MongoDBGroupQueryDao
-from domain.taxi.group.persistance.group_update_dao import MongoDBGroupUpdateDao
-
-from domain.taxi.point.persistance.point_query_dao import MongoDBPointQueryDao
+from domain.group.application.group_service import GroupService
+from domain.group.persistance.mysql_group_repository import MySQLGroupRepository
+from domain.taxi_group.persistance.mysql_taxi_group_dao import MySQLTaxiGroupDao
+from domain.taxi_group.application.taxi_group_service import TaxiGroupService
 
 
 class TaxiContainer(containers.DeclarativeContainer):
-    wiring_config = containers.WiringConfiguration(modules=['app.api.taxi.group',
-                                                            'app.api.taxi.point'])
+    wiring_config = containers.WiringConfiguration(modules=['app.api.taxi_group.group_command'])
 
-    mongodb_connection = providers.Singleton(
-        MongoClient,
-        host=mongodb.host,
-        username=mongodb.username,
-        password=mongodb.password,
-        port=mongodb.port,
-        connect=False
+    mysql_connection = providers.Singleton(
+        connect,
+        host=mysql.host,
+        user=mysql.user,
+        password=mysql.password,
+        port=mysql.port,
+        database=mysql.database,
     )
 
-    group_repository = providers.Singleton(MongoDBGroupRepository, mongodb_connection)
-    group_query_dao = providers.Singleton(MongoDBGroupQueryDao, mongodb_connection)
-    group_update_dao = providers.Singleton(MongoDBGroupUpdateDao, mongodb_connection)
-    point_query_dao = providers.Singleton(MongoDBPointQueryDao, mongodb_connection)
+    group_repository = providers.Singleton(MySQLGroupRepository, mysql_connection=mysql_connection)
+    taxi_group_dao = providers.Singleton(MySQLTaxiGroupDao, mysql_connection=mysql_connection)
 
-    group_service = providers.Singleton(GroupService, group_repository=group_repository, group_update_dao=group_update_dao)
+    group_service = providers.Singleton(GroupService, group_repository=group_repository)
+    taxi_group_service = providers.Singleton(TaxiGroupService, group_repository=group_repository, taxi_group_dao=taxi_group_dao)

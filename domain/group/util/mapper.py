@@ -1,5 +1,5 @@
-from domain.taxi.group.entity.group import Group, Member, Point
-from domain.taxi.group.core.status import Status
+from domain.group.entity.group import Group, Member, Point
+from domain.taxi_group.entity.status import Status
 
 
 class GroupEntityMapper:

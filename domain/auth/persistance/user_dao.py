@@ -1,25 +1,39 @@
-class MongoDBUserDao:
-    def __init__(self, mongodb_connection):
-        self.db = mongodb_connection['watso']
+from pymysql import connect
+from util.id_generator import create_id
 
-    def find_id_by_kakao_id(self, kakao_id) -> str | None:
-        find = {
-            'kakao.id': kakao_id
-        }
-        user_json = self.db.user.find_one(find)
-        if user_json is None:
+
+class MySQLUserDao:
+    def __init__(self, mysql_connection: connect):
+        self.connection = mysql_connection
+
+    def find_id_by_kakao_id(self, kakao_id) -> int | None:
+        sql = f'''
+        SELECT user_id
+        FROM kakao_oauth_table
+        WHERE kakao_id = {kakao_id}'''
+
+        cursor = self.connection.cursor()
+        cursor.execute(sql)
+        data = cursor.fetchone()
+        if data is None:
             return None
-        return str(user_json['_id'])
+        return data[0]
 
-    def create(self, nickname, profile_image_url, kakao_id) -> str:
-        data = {
-            'nickname': nickname,
-            'profile_image_url': profile_image_url,
-            'kakao': {
-                'id': kakao_id
-            }
-        }
+    def create(self, kakao_id, nickname, profile_image_url) -> int:
+        cursor = self.connection.cursor()
 
-        id = self.db.user.insert_one(data)
+        user_id = create_id()
+        user_sql = f'''
+        INSERT INTO user_table
+        (id, nickname)
+        VALUE({user_id}, "{nickname}")'''
+        cursor.execute(user_sql)
 
-        return str(id)
+        kakao_sql = f'''
+        INSERT INTO kakao_oauth_table
+        (kakao_id, user_id, nickname, profile_image_url)
+        VALUE({kakao_id}, {user_id}, "{nickname}", "{profile_image_url}")'''
+
+        cursor.execute(kakao_sql)
+
+        return user_id

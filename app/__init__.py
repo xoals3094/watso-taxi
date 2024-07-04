@@ -15,14 +15,11 @@ def create_app():
 
     api = APIRouter(prefix='/api')
 
-    taxi_api = APIRouter(prefix='/taxi')
-    from app.api.taxi import group, point
-    taxi_api.include_router(group.post_router)
-    taxi_api.include_router(point.point_router)
+    from app.api.taxi_group.taxi_api import taxi_router
+    api.include_router(taxi_router)
 
     from app.api.auth.auth import auth_router
     api.include_router(auth_router)
-    api.include_router(taxi_api)
 
     app.include_router(api)
     return app

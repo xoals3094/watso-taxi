@@ -35,5 +35,5 @@ class MySQLUserDao:
         VALUE({kakao_id}, {user_id}, "{nickname}", "{profile_image_url}")'''
 
         cursor.execute(kakao_sql)
-
+        self.connection.commit()
         return user_id

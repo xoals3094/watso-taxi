@@ -31,3 +31,10 @@ def post_exception_handler(app: FastAPI):
             status_code=status.HTTP_406_NOT_ACCEPTABLE,
             content={'msg': exc.msg}
         )
+
+    @app.exception_handler(DomainException.VerifyFailException)
+    def leave_failed_exception(request: Request, exc: DomainException.VerifyFailException):
+        return JSONResponse(
+            status_code=status.HTTP_406_NOT_ACCEPTABLE,
+            content={'msg': exc.msg}
+        )

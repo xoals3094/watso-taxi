@@ -24,3 +24,8 @@ class ParticipationFailedException(DomainException):
 class LeaveFailedException(DomainException):
     def __init__(self, msg):
         super().__init__(msg=msg)
+
+
+class VerifyFailException(DomainException):
+    def __init__(self, msg):
+        super().__init__(msg=msg)

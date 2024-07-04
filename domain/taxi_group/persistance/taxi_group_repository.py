@@ -1,6 +1,7 @@
 from pymysql import connect
 from domain.taxi_group.entity.taxi_group import TaxiGroup
 from domain.taxi_group.entity.status import Status
+from exceptions import PersistenceException
 
 
 class MySQLTaxiGroupRepository:
@@ -16,6 +17,11 @@ class MySQLTaxiGroupRepository:
 
         cursor.execute(sql)
         data = cursor.fetchone()
+
+        if data is None:
+            raise PersistenceException.ResourceNotFoundException(
+                msg=f'그룹 정보를 찾을 수 없습니다. id={group_id}'
+            )
 
         json = {
             'group_id': data[0],

@@ -1,5 +1,6 @@
 from datetime import datetime
 from domain.taxi_group.entity.status import Status
+from exceptions import DomainException
 
 
 class TaxiGroup:
@@ -21,7 +22,9 @@ class TaxiGroup:
 
     def verify_fee(self, total_cost: int):
         if total_cost != self.fee:
-            raise
+            raise DomainException.VerifyFailException(
+                msg=f'비용이 일치하지 않습니다 fee={self.fee} total_cost={total_cost}'
+            )
 
     @staticmethod
     def create(group_id: int, depart_datetime: datetime, direction):

@@ -59,7 +59,9 @@ class Group:
     def verify_users(self, users: List[int]):
         for member_id in self.member.members:
             if member_id not in users:
-                raise
+                raise DomainException.VerifyFailException(
+                    msg=f'참여자가 일치하지 않습니다 member_id={member_id} users={users}'
+                )
 
     @staticmethod
     def create(owner_id: int, max_member: int):

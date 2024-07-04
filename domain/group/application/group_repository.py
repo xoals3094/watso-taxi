@@ -12,5 +12,17 @@ class GroupRepository(metaclass=ABCMeta):
         pass
 
     @abstractmethod
+    def update_is_open(self, group_id, is_open: bool):
+        pass
+
+    @abstractmethod
+    def append_member(self, group_id: int, user_id: int):
+        pass
+
+    @abstractmethod
+    def delete_member(self, group_id: int, user_id: int):
+        pass
+
+    @abstractmethod
     def delete(self, group_id):
         pass

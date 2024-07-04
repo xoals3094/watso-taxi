@@ -1,6 +1,6 @@
 import unittest
 from exceptions import DomainException
-from domain.taxi_group.core.status import Status
+from domain.taxi_group.entity.status import Status
 
 
 class StatusToTest(unittest.TestCase):

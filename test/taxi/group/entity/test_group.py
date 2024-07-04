@@ -3,7 +3,7 @@ from bson import ObjectId
 from datetime import datetime
 from exceptions import AuthenticationException, DomainException
 from domain.group import Group, Point, Member
-from domain.taxi_group.core.status import Status
+from domain.taxi_group.entity.status import Status
 
 
 class GroupCheckOwnerTest(unittest.TestCase):

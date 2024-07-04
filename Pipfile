@@ -16,6 +16,7 @@ bcrypt = "*"
 python-multipart = "*"
 multipledispatch = "*"
 pymysql = "*"
+bson = "*"
 
 [dev-packages]
 

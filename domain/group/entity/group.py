@@ -1,6 +1,6 @@
 from util.id_generator import create_id
 from typing import List
-from exceptions import DomainException, AuthenticationException
+from exceptions import DomainException
 
 
 class Member:
@@ -23,6 +23,10 @@ class Member:
 
         self.members.remove(user_id)
 
+    @staticmethod
+    def mapping(json):
+        return Member(max_member=json['max_member'], members=json['members'])
+
 
 class Group:
     def __init__(self, id: int, owner_id: int, is_open: bool, member: Member):
@@ -30,10 +34,6 @@ class Group:
         self.owner_id = owner_id
         self.is_open = is_open
         self.member = member
-
-    def check_owner_permission(self, user_id):
-        if user_id != self.owner_id:
-            raise AuthenticationException.AccessDeniedException
 
     def open(self):
         self.is_open = True
@@ -56,6 +56,11 @@ class Group:
 
         self.member.remove(user_id)
 
+    def verify_users(self, users: List[int]):
+        for member_id in self.member.members:
+            if member_id not in users:
+                raise
+
     @staticmethod
     def create(owner_id: int, max_member: int):
         group_id = create_id()
@@ -63,3 +68,10 @@ class Group:
         group = Group(id=group_id, owner_id=owner_id, is_open=True, member=member)
 
         return group
+
+    @staticmethod
+    def mapping(json):
+        return Group(id=json['id'],
+                     owner_id=json['owner_id'],
+                     is_open=json['is_open'],
+                     member=Member.mapping(json['member']))

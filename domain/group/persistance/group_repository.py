@@ -1,12 +1,11 @@
-from exceptions import PersistenceException
+from exceptions import query
 from pymysql import connect
 from domain.group.entity.group import Group
-from domain.group.application.group_repository import GroupRepository
 
 
-class MySQLGroupRepository(GroupRepository):
-    def __init__(self, mysql_connection: connect):
-        self.connection = mysql_connection
+class MySQLGroupRepository:
+    def __init__(self, connection: connect):
+        self.connection = connection
 
     def find_group_by_id(self, group_id: int) -> Group:
         group_sql = f'''
@@ -20,7 +19,7 @@ class MySQLGroupRepository(GroupRepository):
         cursor.execute(group_sql)
         group_data = cursor.fetchone()
         if group_data is None:
-            raise PersistenceException.ResourceNotFoundException(
+            raise query.ResourceNotFound(
                 msg=f'그룹 정보를 찾을 수 없습니다. id={group_id}'
             )
 
@@ -35,7 +34,7 @@ class MySQLGroupRepository(GroupRepository):
         json = {
             'id': group_data[0],
             'owner_id': group_data[1],
-            'is_open': group_data[2],
+            'is_open': bool(group_data[2]),
             'member': {
                 'max_member': group_data[3],
                 'members': [data[1] for data in member_data]

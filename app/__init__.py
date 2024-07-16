@@ -1,17 +1,20 @@
 from fastapi import FastAPI, APIRouter
 from src.auth_container import AuthContainer
 from src.taxi_container import TaxiContainer
+from src.payment_container import PaymentContainer
 
-from .exception_handing import domain_exception_handler, psersistence_exception_handler
+from .exception_handing import domain_exception_handler, query_exception_handler, auth_exception_handler
 
 
 def create_app():
     AuthContainer()
     TaxiContainer()
+    PaymentContainer()
 
     app = FastAPI()
-    domain_exception_handler.post_exception_handler(app)
-    psersistence_exception_handler.persistence_exception_handler(app)
+    domain_exception_handler.domain_exception_handler(app)
+    query_exception_handler.query_exception_handler(app)
+    auth_exception_handler.auth_exception_handler(app)
 
     api = APIRouter(prefix='/api')
 

@@ -1,6 +1,6 @@
 from util.id_generator import create_id
 from typing import List
-from exceptions import DomainException
+from exceptions import domain
 
 
 class Member:
@@ -10,16 +10,16 @@ class Member:
 
     def add(self, user_id):
         if self.max_member <= len(self.members):
-            raise DomainException.ParticipationFailedException(msg=f'최대 인원에 도달하여 참여 불가능합니다 {len(self.members)}/{self.max_member}')
+            raise domain.ParticipationFailed(msg=f'최대 인원에 도달하여 참여 불가능합니다 {len(self.members)}/{self.max_member}')
 
         if user_id in self.members:
-            raise DomainException.ParticipationFailedException(msg='이미 참여한 유저입니다')
+            raise domain.ParticipationFailed(msg='이미 참여한 유저입니다')
 
         self.members.append(user_id)
 
     def remove(self, user_id):
         if user_id not in self.members:
-            raise DomainException.LeaveFailedException(msg='참여하지 않은 유저입니다')
+            raise domain.LeaveFailed(msg='참여하지 않은 유저입니다')
 
         self.members.remove(user_id)
 
@@ -43,23 +43,23 @@ class Group:
 
     def participate(self, user_id):
         if self.is_open is False:
-            raise DomainException.ParticipationFailedException(msg=f'참여가 불가능한 그룹입니다 is_open={self.is_open}')
+            raise domain.ParticipationFailed(msg=f'참여가 마감된 그룹입니다 is_open={self.is_open}')
 
         self.member.add(user_id)
 
     def leave(self, user_id):
         if self.owner_id == user_id:
-            raise DomainException.ParticipationFailedException(msg=f'그룹장 유저는 탈퇴가 불가능합니다')
+            raise domain.ParticipationFailed(msg=f'그룹장 유저는 탈퇴가 불가능합니다')
 
         if self.is_open is False:
-            raise DomainException.ParticipationFailedException(msg=f'탈퇴가 불가능한 그룹입니다 is_open={self.is_open}')
+            raise domain.ParticipationFailed(msg=f'탈퇴가 불가능한 그룹입니다 is_open={self.is_open}')
 
         self.member.remove(user_id)
 
     def verify_users(self, users: List[int]):
         for member_id in self.member.members:
             if member_id not in users:
-                raise DomainException.VerifyFailException(
+                raise domain.VerifyFail(
                     msg=f'참여자가 일치하지 않습니다 member_id={member_id} users={users}'
                 )
 

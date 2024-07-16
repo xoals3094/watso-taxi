@@ -1,12 +1,12 @@
 from pymysql import connect
 from domain.taxi_group.entity.taxi_group import TaxiGroup
 from domain.taxi_group.entity.status import Status
-from exceptions import PersistenceException
+from exceptions import query
 
 
 class MySQLTaxiGroupRepository:
-    def __init__(self, mysql_connection: connect):
-        self.connection = mysql_connection
+    def __init__(self, connection: connect):
+        self.connection = connection
 
     def find_taxi_group_by_id(self, group_id) -> TaxiGroup:
         cursor = self.connection.cursor()
@@ -19,7 +19,7 @@ class MySQLTaxiGroupRepository:
         data = cursor.fetchone()
 
         if data is None:
-            raise PersistenceException.ResourceNotFoundException(
+            raise query.ResourceNotFound(
                 msg=f'그룹 정보를 찾을 수 없습니다. id={group_id}'
             )
 
@@ -51,6 +51,17 @@ class MySQLTaxiGroupRepository:
         sql = f'''
         UPDATE taxi_group_table
         SET status = "{status}"
+        WHERE group_id = {group_id}'''
+
+        cursor.execute(sql)
+        self.connection.commit()
+        cursor.close()
+
+    def update_fee(self, group_id: int, fee: int):
+        cursor = self.connection.cursor()
+        sql = f'''
+        UPDATE taxi_group_table
+        SET fee = {fee}
         WHERE group_id = {group_id}'''
 
         cursor.execute(sql)

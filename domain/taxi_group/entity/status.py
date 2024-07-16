@@ -1,5 +1,5 @@
 from enum import Enum
-from exceptions import DomainException
+from exceptions import domain
 
 
 class Status(str, Enum):
@@ -18,6 +18,6 @@ class Status(str, Enum):
         elif (self is Status.SETTLEMENT) and (status is Status.COMPLETED):
             return
 
-        raise DomainException.InvalidStateException(
+        raise domain.InvalidState(
             msg=f"'{self}' -> '{status}'는 허용되지 않는 상태코드 변경입니다."
         )

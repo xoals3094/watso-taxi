@@ -1,14 +1,15 @@
 from pymysql import connect
 from typing import List
 from domain.taxi_group.entity.status import Status
-from domain.taxi_group.dto.response_group_detail import ResponseGroupDetail
-from domain.taxi_group.dto.response_group_summary import ResponseGroupSummary
-from exceptions import PersistenceException
+from query.taxi_group.dto.response_group_detail import ResponseGroupDetail
+from query.taxi_group.dto.response_group_summary import ResponseGroupSummary
+from query.taxi_group.dto.response_bill import ResponseBills
+from exceptions import query
 
 
 class MySQLTaxiGroupQueryDao:
-    def __init__(self, mysql_connection: connect):
-        self.mysql_connection = mysql_connection
+    def __init__(self, connection: connect):
+        self.connection = connection
 
     def find_groups(self, user_id, direction, depart_datetime) -> List[ResponseGroupSummary]:
         sql = f'''
@@ -23,7 +24,7 @@ class MySQLTaxiGroupQueryDao:
         AND g.id NOT IN (SELECT group_id FROM group_member_table WHERE user_id = {user_id}) 
         '''
 
-        cursor = self.mysql_connection.cursor()
+        cursor = self.connection.cursor()
         cursor.execute(sql)
         datas = cursor.fetchall()
         datas_json = [
@@ -56,13 +57,11 @@ class MySQLTaxiGroupQueryDao:
         WHERE g.id = {group_id}
         '''
 
-        cursor = self.mysql_connection.cursor()
+        cursor = self.connection.cursor()
         cursor.execute(group_sql)
         group_data = cursor.fetchone()
         if group_data is None:
-            raise PersistenceException.ResourceNotFoundException(
-                msg=f'그룹 정보를 찾을 수 없습니다. id={group_id}'
-            )
+            raise query.ResourceNotFound(msg='그룹 정보를 찾을 수 없습니다')
 
         member_sql = f'''
         SELECT user_id FROM group_member_table 
@@ -91,3 +90,27 @@ class MySQLTaxiGroupQueryDao:
 
         cursor.close()
         return ResponseGroupDetail.mapping(taxi_group_json)
+
+    def find_bills_by_group_id(self, group_id: int) -> ResponseBills:
+        sql = '''
+        SELECT u.id as user_id, u.nickname, b.cost 
+        FROM bill_table b 
+        INNER JOIN user_table u ON b.user_id = u.id
+        WHERE group_id = %s'''
+
+        cursor = self.connection.cursor()
+        cursor.execute(sql, group_id)
+
+        datas = cursor.fetchall()
+        json = {
+            'bills': [
+                {
+                    'user': {
+                        'id': data[0],
+                        'nickname': data[1]
+                    },
+                    'cost': data[2]
+                } for data in datas]
+        }
+
+        return ResponseBills.mapping(json)

@@ -1,10 +1,9 @@
 from domain.group.entity.group import Group
-from domain.group.application.group_repository import GroupRepository
-from util.owner_permisson import owner_permission
+from domain.group.persistance.group_repository import MySQLGroupRepository
 
 
 class GroupService:
-    def __init__(self, group_repository: GroupRepository):
+    def __init__(self, group_repository: MySQLGroupRepository):
         self.group_repository = group_repository
 
     def create(self, owner_id: int, max_member: int) -> int:

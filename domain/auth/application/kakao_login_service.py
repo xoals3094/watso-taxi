@@ -1,20 +1,27 @@
 from domain.auth.persistance.user_dao import MySQLUserDao
-from domain.auth.util.token_generator import TokenGenerator
+from domain.auth.persistance.token_dao import MySQLTokenDao
+from domain.auth.persistance.kakao_dao import get_user_info
+from domain.auth.exception import persistence
+from util.token_generator import create_access_token, create_refresh_token
 
 
 class KakaoLoginService:
-    def __init__(self, kakao_dao, user_dao: MySQLUserDao):
-        self.kakao_dao = kakao_dao
+    def __init__(self, user_dao: MySQLUserDao, token_dao: MySQLTokenDao):
         self.user_dao = user_dao
+        self.token_dao = token_dao
 
     def login(self, access_token) -> (str, str):
-        kakao_user_info = self.kakao_dao.get_user_info(access_token)
-        user_id = self.user_dao.find_id_by_kakao_id(kakao_user_info.id)
-        if user_id is None:
+        kakao_user_info = get_user_info(access_token)
+
+        try:
+            user_id = self.user_dao.find_id_by_kakao_id(kakao_user_info.id)
+        except persistence.ResourceNotFound:
             user_id = self.user_dao.create(kakao_user_info.id, kakao_user_info.nickname, kakao_user_info.profile_image_url)
 
-        access_token = TokenGenerator.create_access_token(user_id)
-        refresh_token = TokenGenerator.create_refresh_token()
+        access_token = create_access_token(user_id)
+        refresh_token = create_refresh_token()
+
+        self.token_dao.insert(user_id, access_token, refresh_token)
 
         return access_token, refresh_token
 

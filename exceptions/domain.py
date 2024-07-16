@@ -1,4 +1,4 @@
-from .DefaultException import DefaultException
+from .defualt import DefaultException
 
 
 class DomainException(DefaultException):
@@ -6,26 +6,21 @@ class DomainException(DefaultException):
         super().__init__(msg=msg)
 
 
-class PostModificationFailedException(DomainException):
+class InvalidState(DomainException):
     def __init__(self, msg):
         super().__init__(msg=msg)
 
 
-class InvalidStateException(DomainException):
+class ParticipationFailed(DomainException):
     def __init__(self, msg):
         super().__init__(msg=msg)
 
 
-class ParticipationFailedException(DomainException):
+class LeaveFailed(DomainException):
     def __init__(self, msg):
         super().__init__(msg=msg)
 
 
-class LeaveFailedException(DomainException):
-    def __init__(self, msg):
-        super().__init__(msg=msg)
-
-
-class VerifyFailException(DomainException):
+class VerifyFail(DomainException):
     def __init__(self, msg):
         super().__init__(msg=msg)

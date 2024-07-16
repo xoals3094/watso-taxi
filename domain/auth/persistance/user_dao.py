@@ -1,12 +1,13 @@
 from pymysql import connect
 from util.id_generator import create_id
+from domain.auth.exception import persistence
 
 
 class MySQLUserDao:
-    def __init__(self, mysql_connection: connect):
-        self.connection = mysql_connection
+    def __init__(self, connection: connect):
+        self.connection = connection
 
-    def find_id_by_kakao_id(self, kakao_id) -> int | None:
+    def find_id_by_kakao_id(self, kakao_id) -> int:
         sql = f'''
         SELECT user_id
         FROM kakao_oauth_table
@@ -16,8 +17,11 @@ class MySQLUserDao:
         cursor.execute(sql)
         data = cursor.fetchone()
         if data is None:
-            return None
-        return data[0]
+            raise persistence.ResourceNotFound
+
+        user_id = data[0]
+
+        return user_id
 
     def create(self, kakao_id, nickname, profile_image_url) -> int:
         cursor = self.connection.cursor()

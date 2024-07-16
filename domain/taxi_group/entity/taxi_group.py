@@ -1,6 +1,6 @@
 from datetime import datetime
 from domain.taxi_group.entity.status import Status
-from exceptions import DomainException
+from exceptions import domain
 
 
 class TaxiGroup:
@@ -20,9 +20,15 @@ class TaxiGroup:
         self.status.to(status)
         self.status = status
 
+    def set_fee(self, fee: int):
+        if self.status not in [Status.RECRUITING, Status.CLOSED]:
+            raise domain.InvalidState(msg=f'비용 변경이 불가능한 상태입니다 status={taxi_group.status}')
+
+        self.fee = fee
+
     def verify_fee(self, total_cost: int):
         if total_cost != self.fee:
-            raise DomainException.VerifyFailException(
+            raise domain.VerifyFail(
                 msg=f'비용이 일치하지 않습니다 fee={self.fee} total_cost={total_cost}'
             )
 

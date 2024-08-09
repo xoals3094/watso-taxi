@@ -3,19 +3,19 @@ from exceptions import domain
 
 
 class Status(str, Enum):
-    RECRUITING = 'RECRUITING'
-    CLOSED = 'CLOSED'
-    SETTLEMENT = 'SETTLEMENT'
-    COMPLETED = 'COMPLETED'
+    OPEN = 'OPEN'
+    CLOSE = 'CLOSE'
+    SETTLE = 'SETTLE'
+    COMPLETE = 'COMPLETE'
 
     def to(self, status):
-        if (self is Status.RECRUITING) and (status in [Status.RECRUITING, Status.CLOSED]):
+        if (self is Status.OPEN) and (status in [Status.OPEN, Status.CLOSE]):
             return
 
-        elif (self is Status.CLOSED) and (status in [Status.RECRUITING, Status.CLOSED, Status.SETTLEMENT]):
+        elif (self is Status.CLOSE) and (status in [Status.OPEN, Status.CLOSE, Status.SETTLE]):
             return
 
-        elif (self is Status.SETTLEMENT) and (status is Status.COMPLETED):
+        elif (self is Status.SETTLE) and (status is Status.COMPLETE):
             return
 
         raise domain.InvalidState(

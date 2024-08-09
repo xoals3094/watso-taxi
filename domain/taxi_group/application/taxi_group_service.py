@@ -42,15 +42,15 @@ class TaxiGroupService:
         self.taxi_group_repository.update_fee(group_id, taxi_group.fee)
         self.bill_dao.update_bills(group_id, bills)
 
-    def recruit(self, group_id):
+    def open(self, group_id):
         taxi_group = self.taxi_group_repository.find_taxi_group_by_id(group_id)
-        taxi_group.set_status(Status.RECRUITING)
+        taxi_group.set_status(Status.OPEN)
         self.group_service.open(group_id)
         self.taxi_group_repository.update_status(group_id, taxi_group.status)
 
     def close(self, group_id):
         taxi_group = self.taxi_group_repository.find_taxi_group_by_id(group_id)
-        taxi_group.set_status(Status.CLOSED)
+        taxi_group.set_status(Status.CLOSE)
         self.group_service.close(group_id)
         self.taxi_group_repository.update_status(group_id, taxi_group.status)
 
@@ -60,13 +60,13 @@ class TaxiGroupService:
         bills = self.bill_dao.find_bills_by_group_id(group_id)
 
         bills.verify(fee=taxi_group.fee, members=group.member.members)
-        taxi_group.set_status(Status.SETTLEMENT)
+        taxi_group.set_status(Status.SETTLE)
 
         self.taxi_group_repository.update_status(group_id, taxi_group.status)
 
     def complete(self, group_id: int):
         taxi_group = self.taxi_group_repository.find_taxi_group_by_id(group_id)
-        taxi_group.set_status(Status.COMPLETED)
+        taxi_group.set_status(Status.COMPLETE)
 
         # 완료 코드
 

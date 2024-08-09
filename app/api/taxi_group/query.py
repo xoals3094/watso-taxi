@@ -42,9 +42,9 @@ class MemBerSummaryModel(BaseModel):
 class ResponseTaxiGroupModel(BaseModel):
     id: int = Field(..., description='그룹 ID', examples=[1719843797268])
     owner: OwnerModel
-    status: str = Field(..., description='상태 코드', examples=['RECRUITING'])
+    status: str = Field(..., description='상태 코드', examples=['OPEN'])
     direction: str = Field(..., description='방면', examples=['CAMPUS'])
-    depart_datetime: datetime = Field(..., description='출발 시간', examples=[datetime.now().strftime('%yyyy-%m-%dT%H:%M:%S')])
+    depart_datetime: datetime = Field(..., description='출발 시간', examples=[datetime.now().strftime('%Y-%m-%dT%H:%M:%S')])
     fee: int = Field(..., description='비용', examples=['6200'])
     member: MemberModel
 
@@ -52,9 +52,9 @@ class ResponseTaxiGroupModel(BaseModel):
 class ResponseTaxiGroupSummaryModel(BaseModel):
     id: int = Field(..., description='그룹 ID', examples=[1719843797268])
     owner: OwnerModel
-    status: str = Field(..., description='상태 코드', examples=['RECRUITING'])
+    status: str = Field(..., description='상태 코드', examples=['OPEN'])
     direction: str = Field(..., description='방면', examples=['CAMPUS'])
-    depart_datetime: datetime = Field(..., description='출발 시간', examples=[datetime.now().strftime('%yyyy-%m-%dT%H:%M:%S')])
+    depart_datetime: datetime = Field(..., description='출발 시간', examples=[datetime.now().strftime('%Y-%m-%dT%H:%M:%S')])
     fee: int = Field(..., description='비용', examples=['6200'])
     member: MemBerSummaryModel
 

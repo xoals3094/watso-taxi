@@ -21,8 +21,8 @@ class TaxiGroup:
         self.status = status
 
     def set_fee(self, fee: int):
-        if self.status not in [Status.RECRUITING, Status.CLOSED]:
-            raise domain.InvalidState(msg=f'비용 변경이 불가능한 상태입니다 status={taxi_group.status}')
+        if self.status not in [Status.OPEN, Status.CLOSE]:
+            raise domain.InvalidState(msg=f'비용 변경이 불가능한 상태입니다 status={self.status}')
 
         self.fee = fee
 
@@ -36,7 +36,7 @@ class TaxiGroup:
     def create(group_id: int, depart_datetime: datetime, direction):
         return TaxiGroup(group_id=group_id,
                          fee=6200,
-                         status=Status.RECRUITING,
+                         status=Status.OPEN,
                          depart_datetime=depart_datetime,
                          direction=direction)
 

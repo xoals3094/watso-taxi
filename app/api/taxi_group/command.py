@@ -69,12 +69,12 @@ async def update_fee(group_id: int,
     taxi_group_service.update_bill(group_id=group_id, bills=Bills(bills), fee=req.fee)
 
 
-@taxi_router.patch('/{group_id}/recruit', status_code=status.HTTP_204_NO_CONTENT, tags=['taxi-command'])
+@taxi_router.patch('/{group_id}/open', status_code=status.HTTP_204_NO_CONTENT, tags=['taxi-command'])
 @inject
 async def recruit_group(group_id: int,
                         is_owner: bool = Depends(owner_permission),
                         taxi_group_service: TaxiGroupService = Depends(Provide[TaxiContainer.taxi_group_service])):
-    taxi_group_service.recruit(group_id=group_id)
+    taxi_group_service.open(group_id=group_id)
 
 
 @taxi_router.patch('/{group_id}/close', status_code=status.HTTP_204_NO_CONTENT, tags=['taxi-command'])

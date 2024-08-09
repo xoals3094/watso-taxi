@@ -44,7 +44,7 @@ class ResponseTaxiGroupModel(BaseModel):
     owner: OwnerModel
     status: str = Field(..., description='상태 코드', examples=['OPEN'])
     direction: str = Field(..., description='방면', examples=['CAMPUS'])
-    depart_datetime: datetime = Field(..., description='출발 시간', examples=[datetime.now().strftime('%yyyy-%m-%dT%H:%M:%S')])
+    depart_datetime: datetime = Field(..., description='출발 시간', examples=[datetime.now().strftime('%Y-%m-%dT%H:%M:%S')])
     fee: int = Field(..., description='비용', examples=['6200'])
     member: MemberModel
 
@@ -54,7 +54,7 @@ class ResponseTaxiGroupSummaryModel(BaseModel):
     owner: OwnerModel
     status: str = Field(..., description='상태 코드', examples=['OPEN'])
     direction: str = Field(..., description='방면', examples=['CAMPUS'])
-    depart_datetime: datetime = Field(..., description='출발 시간', examples=[datetime.now().strftime('%yyyy-%m-%dT%H:%M:%S')])
+    depart_datetime: datetime = Field(..., description='출발 시간', examples=[datetime.now().strftime('%Y-%m-%dT%H:%M:%S')])
     fee: int = Field(..., description='비용', examples=['6200'])
     member: MemBerSummaryModel
 

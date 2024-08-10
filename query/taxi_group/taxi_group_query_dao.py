@@ -92,25 +92,30 @@ class MySQLTaxiGroupQueryDao:
         return ResponseGroupDetail.mapping(taxi_group_json)
 
     def find_bills_by_group_id(self, group_id: int) -> ResponseBills:
-        sql = '''
+        bill_sql = '''
         SELECT u.id as user_id, u.nickname, b.cost 
         FROM bill_table b 
         INNER JOIN user_table u ON b.user_id = u.id
         WHERE group_id = %s'''
 
         cursor = self.connection.cursor()
-        cursor.execute(sql, group_id)
+        cursor.execute(bill_sql, group_id)
+        bill_datas = cursor.fetchall()
 
-        datas = cursor.fetchall()
+        fee_sql = 'SELECT fee FROM taxi_group_table WHERE group_id = %s'
+        cursor.execute(fee_sql, group_id)
+        fee_data = cursor.fetchone()
+
         json = {
+            'fee': fee_data[0],
             'bills': [
                 {
                     'user': {
-                        'id': data[0],
-                        'nickname': data[1]
+                        'id': bill_data[0],
+                        'nickname': bill_data[1]
                     },
-                    'cost': data[2]
-                } for data in datas]
+                    'cost': bill_data[2]
+                } for bill_data in bill_datas]
         }
 
         return ResponseBills.mapping(json)

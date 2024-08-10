@@ -36,16 +36,19 @@ class Bill:
 
 
 class ResponseBills:
-    def __init__(self, bills: List[Bill]):
+    def __init__(self, fee: int, bills: List[Bill]):
+        self.fee = fee
         self.bills = bills
 
     @property
     def json(self):
         return {
+            'fee': self.fee,
             'bills': [bill.json for bill in self.bills]
         }
 
     @staticmethod
     def mapping(json):
+        fee = json['fee']
         bills = [Bill.mapping(bill) for bill in json['bills']]
-        return ResponseBills(bills)
+        return ResponseBills(fee, bills)

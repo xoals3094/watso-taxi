@@ -70,6 +70,7 @@ class ResponseBill(BaseModel):
 
 
 class ResponseBills(BaseModel):
+    fee: int = Field(..., description='전체 비용', examples=[6000])
     bills: List[ResponseBill]
 
 
@@ -96,7 +97,7 @@ async def get_taxi_group_detail(group_id: int,
     return group.json
 
 
-@taxi_router.get('/{group_id}/bills', response_model=ResponseBills, tags=['taxi-query'])
+@taxi_router.get('/{group_id}/fee', response_model=ResponseBills, tags=['taxi-query'])
 @inject
 async def get_bills(group_id: int,
                     group_query: MySQLTaxiGroupQueryDao = Depends(Provide[TaxiContainer.taxi_group_query_dao])):

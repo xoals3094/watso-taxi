@@ -48,15 +48,19 @@ class RequestUpdateFeeModel(BaseModel):
     bills: List[RequestBill]
 
 
-@taxi_router.post('', status_code=status.HTTP_201_CREATED, tags=['taxi-command'])
+@taxi_router.post('', status_code=status.HTTP_201_CREATED, response_model=ResponseCreateGroupModel, tags=['taxi-command'])
 @inject
 async def create_taxi_group(req: RequestCreateGroupModel,
                             user_id=Depends(get_user_id),
                             taxi_group_service: TaxiGroupService = Depends(Provide[TaxiContainer.taxi_group_service])):
-    taxi_group_service.create(owner_id=user_id,
-                              max_member=req.max_member,
-                              depart_datetime=req.depart_datetime,
-                              direction=req.direction)
+    group_id = taxi_group_service.create(owner_id=user_id,
+                                         max_member=req.max_member,
+                                         depart_datetime=req.depart_datetime,
+                                         direction=req.direction)
+
+    return {
+        'group_id': group_id
+    }
 
 
 @taxi_router.patch('/{group_id}/fee', status_code=status.HTTP_204_NO_CONTENT, tags=['taxi-command'])

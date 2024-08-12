@@ -1,4 +1,5 @@
 from datetime import datetime
+from domain.taxi_group.entity.status import Status
 
 
 class Owner:
@@ -15,7 +16,7 @@ class Owner:
 
     @staticmethod
     def mapping(json):
-        return Owner(id=str(json['id']), nickname=json['nickname'])
+        return Owner(id=json['id'], nickname=json['nickname'])
 
 
 class Member:
@@ -37,15 +38,17 @@ class Member:
 
 class ResponseGroupSummary:
     def __init__(self,
-                 id: str,
+                 id: int,
                  owner: Owner,
                  direction: str,
+                 status: Status,
                  depart_datetime: datetime,
                  fee: int,
                  member: Member):
         self.id = id
         self.owner = owner
         self.direction = direction
+        self.status = status
         self.depart_datetime = depart_datetime
         self.fee = fee
         self.member = member
@@ -56,6 +59,7 @@ class ResponseGroupSummary:
             'id': self.id,
             'owner': self.owner.json,
             'direction': self.direction,
+            'status': self.status,
             'depart_datetime': self.depart_datetime,
             'fee': self.fee,
             'member': self.member.json,
@@ -69,6 +73,7 @@ class ResponseGroupSummary:
         return ResponseGroupSummary(id=json['id'],
                                     owner=owner,
                                     direction=json['direction'],
+                                    status=json['status'],
                                     depart_datetime=json['depart_datetime'],
                                     fee=json['fee'],
                                     member=member)

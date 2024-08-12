@@ -83,10 +83,15 @@ class GroupQueryOption(str, Enum):
     JOINED = 'JOINED'
 
 
+class Direction(str, Enum):
+    STATION = 'STATION'
+    CAMPUS = 'CAMPUS'
+
+
 @taxi_router.get('', response_model=List[ResponseTaxiGroupSummaryModel], tags=['taxi-query'])
 @inject
-async def get_taxi_groups(option: GroupQueryOption = Query(None, description='조회할 방향'),
-                          direction: str = None,
+async def get_taxi_groups(option: GroupQueryOption = Query(None, description='조회 옵션'),
+                          direction: Direction = Query(None, description='조회할 방향'),
                           depart_datetime: datetime = None,
                           user_id: int = Depends(get_user_id),
                           group_query: MySQLTaxiGroupQueryDao = Depends(Provide[TaxiContainer.taxi_group_query_dao])):

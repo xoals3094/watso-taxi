@@ -1,4 +1,4 @@
-from fastapi import Depends
+from fastapi import Depends, Query
 from pydantic import BaseModel, Field
 from datetime import datetime
 from dependency_injector.wiring import inject, Provide
@@ -6,7 +6,7 @@ from typing import List
 from src.taxi_container import TaxiContainer
 from src.payment_container import PaymentContainer
 from util.token_decoder import get_user_id
-
+from enum import Enum
 from query.taxi_group.taxi_group_query_dao import MySQLTaxiGroupQueryDao
 from domain.payment.application.payment_service import PaymentService
 from app.api.taxi_group.taxi_api import taxi_router
@@ -78,14 +78,19 @@ class ResponseURL(BaseModel):
     url: str = Field(..., description='정산 URL', examples=['https://qr.kakaopay.com/code'])
 
 
+class GroupQueryOption(str, Enum):
+    JOINABLE = 'JOINABLE'
+    JOINED = 'JOINED'
+
+
 @taxi_router.get('', response_model=List[ResponseTaxiGroupSummaryModel], tags=['taxi-query'])
 @inject
-async def get_taxi_groups(direction: str,
-                          depart_datetime: datetime,
+async def get_taxi_groups(option: GroupQueryOption = Query(None, description='조회할 방향'),
+                          direction: str = None,
+                          depart_datetime: datetime = None,
                           user_id: int = Depends(get_user_id),
                           group_query: MySQLTaxiGroupQueryDao = Depends(Provide[TaxiContainer.taxi_group_query_dao])):
-
-    groups = group_query.find_groups(user_id, direction, depart_datetime)
+    groups = group_query.find_groups(user_id, option, direction, depart_datetime)
     return [group.json for group in groups]
 
 

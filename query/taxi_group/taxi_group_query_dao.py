@@ -5,24 +5,48 @@ from query.taxi_group.dto.response_group_detail import ResponseGroupDetail
 from query.taxi_group.dto.response_group_summary import ResponseGroupSummary
 from query.taxi_group.dto.response_bill import ResponseBills
 from exceptions import query
+from datetime import datetime, timedelta
 
 
 class MySQLTaxiGroupQueryDao:
     def __init__(self, connection: connect):
         self.connection = connection
 
-    def find_groups(self, user_id, direction, depart_datetime) -> List[ResponseGroupSummary]:
+    def find_groups(self, user_id, option, direction, depart_datetime) -> List[ResponseGroupSummary]:
         sql = f'''
-        SELECT g.id, owner_id, u.nickname, direction, depart_datetime, status, fee, max_member, 
-        (SELECT COUNT(group_id) FROM group_member_table WHERE group_id = g.id) AS current_member
-        FROM group_table g
-        INNER JOIN taxi_group_table t ON g.id = t.group_id
-        LEFT JOIN user_table u ON owner_id = u.id
-        WHERE is_open = true 
-        AND direction = "{direction}" 
-        AND depart_datetime >= "{depart_datetime}"
-        AND g.id NOT IN (SELECT group_id FROM group_member_table WHERE user_id = {user_id}) 
-        '''
+                    SELECT g.id, owner_id, u.nickname, direction, depart_datetime, status, fee, max_member, 
+                    (SELECT COUNT(group_id) FROM group_member_table WHERE group_id = g.id) AS current_member
+                    FROM group_table g
+                    INNER JOIN taxi_group_table t ON g.id = t.group_id
+                    LEFT JOIN user_table u ON owner_id = u.id
+                    WHERE status = "COMPLETE" 
+                    AND depart_datetime >= "{datetime.now() - timedelta(days=90)}"
+                    AND g.id NOT IN (SELECT group_id FROM group_member_table WHERE user_id = {user_id}) 
+                '''
+
+        if option == 'JOINABLE':
+            sql = f'''
+                        SELECT g.id, owner_id, u.nickname, direction, depart_datetime, status, fee, max_member, 
+                        (SELECT COUNT(group_id) FROM group_member_table WHERE group_id = g.id) AS current_member
+                        FROM group_table g
+                        INNER JOIN taxi_group_table t ON g.id = t.group_id
+                        LEFT JOIN user_table u ON owner_id = u.id
+                        WHERE is_open = true 
+                        AND direction = "{direction}" 
+                        AND depart_datetime >= "{depart_datetime}"
+                        AND g.id NOT IN (SELECT group_id FROM group_member_table WHERE user_id = {user_id}) 
+                    '''
+
+        elif option == 'JOINED':
+            sql = f'''
+                        SELECT g.id, owner_id, u.nickname, direction, depart_datetime, status, fee, max_member, 
+                        (SELECT COUNT(group_id) FROM group_member_table WHERE group_id = g.id) AS current_member
+                        FROM group_table g
+                        INNER JOIN taxi_group_table t ON g.id = t.group_id
+                        LEFT JOIN user_table u ON owner_id = u.id
+                        WHERE status != "COMPLETE"
+                        AND g.id IN (SELECT group_id FROM group_member_table WHERE user_id = {user_id}) 
+                    '''
 
         cursor = self.connection.cursor()
         cursor.execute(sql)
@@ -45,7 +69,6 @@ class MySQLTaxiGroupQueryDao:
             }
             for data in datas
         ]
-
         return [ResponseGroupSummary.mapping(json) for json in datas_json]
 
     def find_group(self, group_id) -> ResponseGroupDetail:

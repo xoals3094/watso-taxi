@@ -33,6 +33,12 @@ class MySQLTokenDao:
 
         self.connection.commit()
 
+    def delete(self, refresh_token):
+        sql = f'DELETE FROM token_table WHERE refresh_token = %s'
+        cursor = self.connection.cursor()
+        cursor.execute(sql, refresh_token)
+        self.connection.commit()
+
     def update_access_token(self, user_id, access_token):
         sql = f'''
         UPDATE token_table 

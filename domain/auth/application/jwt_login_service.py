@@ -10,6 +10,9 @@ class JWTLoginService:
     def __init__(self, token_dao: MySQLTokenDao):
         self.token_dao = token_dao
 
+    def logout(self, refresh_token):
+        self.token_dao.delete(refresh_token)
+
     def refresh(self, refresh_token) -> (str, str):
         try:
             user_id = self.token_dao.find_user_id_by_refresh_token(refresh_token)

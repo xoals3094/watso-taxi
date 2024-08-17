@@ -18,6 +18,12 @@ class RequestRefreshModel(BaseModel):
     refresh_token: str = Field(..., description='refresh token', examples=['jwt token'])
 
 
+@auth_router.delete('/logout', tags=['auth'])
+@inject
+async def logout(req: RequestRefreshModel, jwt_login_service: JWTLoginService = Depends(Provide[AuthContainer.jwt_login_service])):
+    jwt_login_service.logout(req.refresh_token)
+
+
 @auth_router.post('/login/refresh', response_model=ResponseLoginModel, tags=['auth'])
 @inject
 async def refresh(req: RequestRefreshModel, jwt_login_service: JWTLoginService = Depends(Provide[AuthContainer.jwt_login_service])):

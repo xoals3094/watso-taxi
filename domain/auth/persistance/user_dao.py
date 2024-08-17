@@ -29,8 +29,8 @@ class MySQLUserDao:
         user_id = create_id()
         user_sql = f'''
         INSERT INTO user_table
-        (id, nickname)
-        VALUE({user_id}, "{nickname}")'''
+        (id, nickname, profile_image_url)
+        VALUE({user_id}, "{nickname}", "{profile_image_url}")'''
         cursor.execute(user_sql)
 
         kakao_sql = f'''

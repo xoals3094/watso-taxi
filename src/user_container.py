@@ -16,5 +16,5 @@ class UserContainer(containers.DeclarativeContainer):
         database=mysql.database
     )
 
-    user_dao = providers.Singleton(MySQLUserDao, connection=connection)
+    user_dao = providers.Singleton(MySQLUserDao, mysql_connection=connection)
     user_service = providers.Singleton(UserService, user_dao=user_dao)

@@ -14,11 +14,10 @@ class MySQLTaxiGroupQueryDao:
 
     def find_groups(self, user_id, option, direction, depart_datetime) -> List[ResponseGroupSummary]:
         sql = f'''
-                    SELECT g.id, owner_id, u.nickname, direction, depart_datetime, status, fee, max_member, 
+                    SELECT g.id, owner_id, direction, depart_datetime, status, fee, max_member, 
                     (SELECT COUNT(group_id) FROM group_member_table WHERE group_id = g.id) AS current_member
                     FROM group_table g
                     INNER JOIN taxi_group_table t ON g.id = t.group_id
-                    LEFT JOIN user_table u ON owner_id = u.id
                     WHERE status = "COMPLETE" 
                     AND depart_datetime >= "{datetime.now() - timedelta(days=90)}"
                     AND g.id NOT IN (SELECT group_id FROM group_member_table WHERE user_id = {user_id}) 
@@ -26,11 +25,10 @@ class MySQLTaxiGroupQueryDao:
 
         if option == 'JOINABLE':
             sql = f'''
-                        SELECT g.id, owner_id, u.nickname, direction, depart_datetime, status, fee, max_member, 
+                        SELECT g.id, owner_id, direction, depart_datetime, status, fee, max_member, 
                         (SELECT COUNT(group_id) FROM group_member_table WHERE group_id = g.id) AS current_member
                         FROM group_table g
                         INNER JOIN taxi_group_table t ON g.id = t.group_id
-                        LEFT JOIN user_table u ON owner_id = u.id
                         WHERE is_open = true 
                         AND direction = "{direction}" 
                         AND depart_datetime >= "{depart_datetime}"
@@ -39,11 +37,10 @@ class MySQLTaxiGroupQueryDao:
 
         elif option == 'JOINED':
             sql = f'''
-                        SELECT g.id, owner_id, u.nickname, direction, depart_datetime, status, fee, max_member, 
+                        SELECT g.id, owner_id, direction, depart_datetime, status, fee, max_member, 
                         (SELECT COUNT(group_id) FROM group_member_table WHERE group_id = g.id) AS current_member
                         FROM group_table g
                         INNER JOIN taxi_group_table t ON g.id = t.group_id
-                        LEFT JOIN user_table u ON owner_id = u.id
                         WHERE status != "COMPLETE"
                         AND g.id IN (SELECT group_id FROM group_member_table WHERE user_id = {user_id}) 
                     '''
@@ -54,17 +51,14 @@ class MySQLTaxiGroupQueryDao:
         datas_json = [
             {
                 'id': data[0],
-                'owner': {
-                    'id': data[1],
-                    'nickname': data[2],
-                },
-                'direction': data[3],
-                'depart_datetime': data[4],
-                'status': data[5],
-                'fee': data[6],
+                'owner_id': data[1],
+                'direction': data[2],
+                'depart_datetime': data[3],
+                'status': data[4],
+                'fee': data[5],
                 'member': {
-                    'max_member': data[7],
-                    'current_member': data[8]
+                    'max_member': data[6],
+                    'current_member': data[7]
                 }
             }
             for data in datas
@@ -73,10 +67,9 @@ class MySQLTaxiGroupQueryDao:
 
     def find_group(self, group_id) -> ResponseGroupDetail:
         group_sql = f'''
-        SELECT g.id, owner_id, u.nickname, direction, depart_datetime, status, fee, max_member
+        SELECT g.id, owner_id, direction, depart_datetime, status, fee, max_member
         FROM group_table g
         INNER JOIN taxi_group_table t ON g.id = t.group_id
-        LEFT JOIN user_table u ON owner_id = u.id
         WHERE g.id = {group_id}
         '''
 
@@ -96,17 +89,14 @@ class MySQLTaxiGroupQueryDao:
 
         taxi_group_json = {
             'id': group_data[0],
-            'owner': {
-                'id': group_data[1],
-                'nickname': group_data[2]
-            },
-            'direction': group_data[3],
-            'depart_datetime': group_data[4],
-            'status': Status(group_data[5]),
-            'fee': group_data[6],
+            'owner_id': group_data[1],
+            'direction': group_data[2],
+            'depart_datetime': group_data[3],
+            'status': Status(group_data[4]),
+            'fee': group_data[5],
             'member': {
                 'current_member': len(members),
-                'max_member': group_data[7],
+                'max_member': group_data[6],
                 'members': members
             }
         }

@@ -12,22 +12,6 @@ from domain.payment.application.payment_service import PaymentService
 from app.api.taxi_group.taxi_api import taxi_router
 
 
-class OwnerModel(BaseModel):
-    id: int = Field(..., description='유저 ID')
-    nickname: str = Field(..., description='닉네임')
-
-    model_config = {
-        'json_schema_extra': {
-            'examples': [
-                {
-                    'id': 1719843797268,
-                    'nickname': '찰봉'
-                }
-            ]
-        }
-    }
-
-
 class MemberModel(BaseModel):
     current_member: int = Field(..., description='현재 인원', examples=[1])
     max_member: int = Field(..., description='최대 인원', examples=[4])
@@ -41,7 +25,7 @@ class MemBerSummaryModel(BaseModel):
 
 class ResponseTaxiGroupModel(BaseModel):
     id: int = Field(..., description='그룹 ID', examples=[1719843797268])
-    owner: OwnerModel
+    owner_id: int = Field(..., description='대표유저 ID', examples=[1719843797268])
     status: str = Field(..., description='상태 코드', examples=['OPEN'])
     direction: str = Field(..., description='방면', examples=['CAMPUS'])
     depart_datetime: datetime = Field(..., description='출발 시간', examples=[datetime.now().strftime('%Y-%m-%dT%H:%M:%S')])
@@ -51,7 +35,7 @@ class ResponseTaxiGroupModel(BaseModel):
 
 class ResponseTaxiGroupSummaryModel(BaseModel):
     id: int = Field(..., description='그룹 ID', examples=[1719843797268])
-    owner: OwnerModel
+    owner_id: int = Field(..., description='대표유저 ID', examples=[1719843797268])
     status: str = Field(..., description='상태 코드', examples=['OPEN'])
     direction: str = Field(..., description='방면', examples=['CAMPUS'])
     depart_datetime: datetime = Field(..., description='출발 시간', examples=[datetime.now().strftime('%Y-%m-%dT%H:%M:%S')])

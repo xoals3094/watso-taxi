@@ -2,19 +2,6 @@ from datetime import datetime
 from typing import List
 
 
-class Owner:
-    def __init__(self, id: str, nickname: str):
-        self.id = id
-        self.nickname = nickname
-
-    @property
-    def json(self):
-        return {
-            'id': self.id,
-            'nickname': self.nickname
-        }
-
-
 class Member:
     def __init__(self, current_member: int, max_member: int, members: List[int]):
         self.current_member = current_member
@@ -37,14 +24,14 @@ class Member:
 class ResponseGroupDetail:
     def __init__(self,
                  id: str,
-                 owner: Owner,
+                 owner_id: int,
                  direction: str,
                  depart_datetime: datetime,
                  status: str,
                  fee: int,
                  member: Member):
         self.id = id
-        self.owner = owner
+        self.owner_id = owner_id
         self.direction = direction
         self.depart_datetime = depart_datetime
         self.status = status
@@ -55,7 +42,7 @@ class ResponseGroupDetail:
     def json(self):
         return {
             'id': self.id,
-            'owner': self.owner.json,
+            'owner_id': self.owner_id,
             'direction': self.direction,
             'depart_datetime': self.depart_datetime,
             'status': self.status,
@@ -65,13 +52,10 @@ class ResponseGroupDetail:
 
     @staticmethod
     def mapping(json):
-        owner_json = json['owner']
-        owner = Owner(id=owner_json['id'], nickname=owner_json['nickname'])
-
         member_json = json['member']
         member = Member.mapping(member_json)
         return ResponseGroupDetail(id=json['id'],
-                                   owner=owner,
+                                   owner_id=json['owner_id'],
                                    direction=json['direction'],
                                    depart_datetime=json['depart_datetime'],
                                    status=json['status'],

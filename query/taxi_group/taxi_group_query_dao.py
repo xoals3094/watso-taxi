@@ -12,6 +12,26 @@ class MySQLTaxiGroupQueryDao:
     def __init__(self, connection: connect):
         self.connection = connection
 
+    @staticmethod
+    def group_list_json_mapping(data_list):
+        datas_json = [
+            {
+                'id': data[0],
+                'owner_id': data[1],
+                'direction': data[2],
+                'depart_datetime': data[3],
+                'status': data[4],
+                'fee': data[5],
+                'member': {
+                    'max_member': data[6],
+                    'current_member': data[7]
+                }
+            }
+            for data in data_list
+        ]
+
+        return datas_json
+
     def find_complete_groups(self, user_id) -> List[ResponseGroupSummary]:
         sql = f'''
                     SELECT g.id, owner_id, direction, depart_datetime, status, fee, max_member, 
@@ -26,21 +46,8 @@ class MySQLTaxiGroupQueryDao:
         cursor = self.connection.cursor()
         cursor.execute(sql)
         datas = cursor.fetchall()
-        datas_json = [
-            {
-                'id': data[0],
-                'owner_id': data[1],
-                'direction': data[2],
-                'depart_datetime': data[3],
-                'status': data[4],
-                'fee': data[5],
-                'member': {
-                    'max_member': data[6],
-                    'current_member': data[7]
-                }
-            }
-            for data in datas
-        ]
+        datas_json = self.group_list_json_mapping(datas)
+
         return [ResponseGroupSummary.mapping(json) for json in datas_json]
 
     def find_joinable_groups(self, user_id, direction, depart_datetime):
@@ -58,21 +65,7 @@ class MySQLTaxiGroupQueryDao:
         cursor = self.connection.cursor()
         cursor.execute(sql)
         datas = cursor.fetchall()
-        datas_json = [
-            {
-                'id': data[0],
-                'owner_id': data[1],
-                'direction': data[2],
-                'depart_datetime': data[3],
-                'status': data[4],
-                'fee': data[5],
-                'member': {
-                    'max_member': data[6],
-                    'current_member': data[7]
-                }
-            }
-            for data in datas
-        ]
+        datas_json = self.group_list_json_mapping(datas)
         return [ResponseGroupSummary.mapping(json) for json in datas_json]
 
     def find_joined_groups(self, user_id):
@@ -88,22 +81,28 @@ class MySQLTaxiGroupQueryDao:
         cursor = self.connection.cursor()
         cursor.execute(sql)
         datas = cursor.fetchall()
-        datas_json = [
-            {
-                'id': data[0],
-                'owner_id': data[1],
-                'direction': data[2],
-                'depart_datetime': data[3],
-                'status': data[4],
-                'fee': data[5],
-                'member': {
-                    'max_member': data[6],
-                    'current_member': data[7]
-                }
-            }
-            for data in datas
-        ]
+        datas_json = self.group_list_json_mapping(datas)
         return [ResponseGroupSummary.mapping(json) for json in datas_json]
+
+    @staticmethod
+    def group_detail_json_mapping(group_data, members_data):
+        members = [data[0] for data in members_data]
+
+        group_detail_json = {
+            'id': group_data[0],
+            'owner_id': group_data[1],
+            'direction': group_data[2],
+            'depart_datetime': group_data[3],
+            'status': Status(group_data[4]),
+            'fee': group_data[5],
+            'member': {
+                'current_member': len(members),
+                'max_member': group_data[6],
+                'members': members
+            }
+        }
+
+        return group_detail_json
 
     def find_group(self, group_id) -> ResponseGroupDetail:
         group_sql = f'''
@@ -125,24 +124,24 @@ class MySQLTaxiGroupQueryDao:
 
         cursor.execute(member_sql)
         members_data = cursor.fetchall()
-        members = [data[0] for data in members_data]
+        taxi_group_json = self.group_detail_json_mapping(group_data, members_data)
+        return ResponseGroupDetail.mapping(taxi_group_json)
 
-        taxi_group_json = {
-            'id': group_data[0],
-            'owner_id': group_data[1],
-            'direction': group_data[2],
-            'depart_datetime': group_data[3],
-            'status': Status(group_data[4]),
-            'fee': group_data[5],
-            'member': {
-                'current_member': len(members),
-                'max_member': group_data[6],
-                'members': members
-            }
+    @staticmethod
+    def bills_json_mapping(fee_data, bills_data):
+        json = {
+            'fee': fee_data[0],
+            'bills': [
+                {
+                    'user': {
+                        'id': bill_data[0],
+                        'nickname': bill_data[1]
+                    },
+                    'cost': bill_data[2]
+                } for bill_data in bills_data]
         }
 
-        cursor.close()
-        return ResponseGroupDetail.mapping(taxi_group_json)
+        return json
 
     def find_bills_by_group_id(self, group_id: int) -> ResponseBills:
         bill_sql = '''
@@ -159,16 +158,6 @@ class MySQLTaxiGroupQueryDao:
         cursor.execute(fee_sql, group_id)
         fee_data = cursor.fetchone()
 
-        json = {
-            'fee': fee_data[0],
-            'bills': [
-                {
-                    'user': {
-                        'id': bill_data[0],
-                        'nickname': bill_data[1]
-                    },
-                    'cost': bill_data[2]
-                } for bill_data in bill_datas]
-        }
+        json = self.bills_json_mapping(fee_data, bill_datas)
 
         return ResponseBills.mapping(json)

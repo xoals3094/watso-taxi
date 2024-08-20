@@ -79,7 +79,15 @@ async def get_taxi_groups(option: GroupQueryOption = Query(None, description='ì¡
                           depart_datetime: datetime = None,
                           user_id: int = Depends(get_user_id),
                           group_query: MySQLTaxiGroupQueryDao = Depends(Provide[TaxiContainer.taxi_group_query_dao])):
-    groups = group_query.find_groups(user_id, option, direction, depart_datetime)
+    if option == GroupQueryOption.JOINABLE.value:
+        groups = group_query.find_joinable_groups(user_id, direction, depart_datetime)
+
+    elif option == GroupQueryOption.JOINED.value:
+        groups = group_query.find_joined_groups(user_id)
+
+    else:
+        groups = group_query.find_complete_groups(user_id)
+
     return [group.json for group in groups]
 
 

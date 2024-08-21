@@ -23,6 +23,11 @@ class MemBerSummaryModel(BaseModel):
     max_member: int = Field(..., description='최대 인원', examples=[4])
 
 
+class ResponseFeeModel(BaseModel):
+    total: int = Field(..., description='총합', examples=['6200'])
+    cost: int = Field(..., description='비용', examples=['3100'])
+
+
 class ResponseTaxiGroupModel(BaseModel):
     id: int = Field(..., description='그룹 ID', examples=[1719843797268])
     owner_id: int = Field(..., description='대표유저 ID', examples=[1719843797268])
@@ -39,7 +44,7 @@ class ResponseTaxiGroupSummaryModel(BaseModel):
     status: str = Field(..., description='상태 코드', examples=['OPEN'])
     direction: str = Field(..., description='방면', examples=['CAMPUS'])
     depart_datetime: datetime = Field(..., description='출발 시간', examples=[datetime.now().strftime('%Y-%m-%dT%H:%M:%S')])
-    fee: int = Field(..., description='비용', examples=['6200'])
+    fee: ResponseFeeModel
     member: MemBerSummaryModel
 
 

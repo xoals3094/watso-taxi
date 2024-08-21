@@ -2,23 +2,6 @@ from datetime import datetime
 from domain.taxi_group.entity.status import Status
 
 
-class Owner:
-    def __init__(self, id: str, nickname: str):
-        self.id = id
-        self.nickname = nickname
-
-    @property
-    def json(self):
-        return {
-            'id': self.id,
-            'nickname': self.nickname
-        }
-
-    @staticmethod
-    def mapping(json):
-        return Owner(id=json['id'], nickname=json['nickname'])
-
-
 class Member:
     def __init__(self, current_member: int, max_member: int):
         self.current_member = current_member
@@ -39,14 +22,14 @@ class Member:
 class ResponseGroupSummary:
     def __init__(self,
                  id: int,
-                 owner: Owner,
+                 owner_id: int,
                  direction: str,
                  status: Status,
                  depart_datetime: datetime,
                  fee: int,
                  member: Member):
         self.id = id
-        self.owner = owner
+        self.owner_id = owner_id
         self.direction = direction
         self.status = status
         self.depart_datetime = depart_datetime
@@ -57,7 +40,7 @@ class ResponseGroupSummary:
     def json(self):
         return {
             'id': self.id,
-            'owner': self.owner.json,
+            'owner_id': self.owner_id,
             'direction': self.direction,
             'status': self.status,
             'depart_datetime': self.depart_datetime,
@@ -67,11 +50,10 @@ class ResponseGroupSummary:
 
     @staticmethod
     def mapping(json):
-        owner = Owner.mapping(json['owner'])
         member = Member.mapping(json['member'])
 
         return ResponseGroupSummary(id=json['id'],
-                                    owner=owner,
+                                    owner_id=json['owner_id'],
                                     direction=json['direction'],
                                     status=json['status'],
                                     depart_datetime=json['depart_datetime'],

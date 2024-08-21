@@ -19,6 +19,23 @@ class Member:
         return Member(current_member=json['current_member'], max_member=json['max_member'])
 
 
+class Fee:
+    def __init__(self, total, cost):
+        self.total = total
+        self.cost = cost
+
+    @property
+    def json(self):
+        return {
+            'total': self.total,
+            'cost': self.cost
+        }
+
+    @staticmethod
+    def mapping(json):
+        return Fee(total=json['total'], cost=json['cost'])
+
+
 class ResponseGroupSummary:
     def __init__(self,
                  id: int,
@@ -26,7 +43,7 @@ class ResponseGroupSummary:
                  direction: str,
                  status: Status,
                  depart_datetime: datetime,
-                 fee: int,
+                 fee: Fee,
                  member: Member):
         self.id = id
         self.owner_id = owner_id
@@ -44,18 +61,19 @@ class ResponseGroupSummary:
             'direction': self.direction,
             'status': self.status,
             'depart_datetime': self.depart_datetime,
-            'fee': self.fee,
+            'fee': self.fee.json,
             'member': self.member.json,
         }
 
     @staticmethod
     def mapping(json):
         member = Member.mapping(json['member'])
+        fee = Fee.mapping(json['fee'])
 
         return ResponseGroupSummary(id=json['id'],
                                     owner_id=json['owner_id'],
                                     direction=json['direction'],
                                     status=json['status'],
                                     depart_datetime=json['depart_datetime'],
-                                    fee=json['fee'],
+                                    fee=fee,
                                     member=member)

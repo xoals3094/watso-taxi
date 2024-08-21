@@ -119,14 +119,17 @@ class MySQLTaxiGroupQueryDao:
     @staticmethod
     def group_detail_json_mapping(group_data, members_data):
         members = [data[0] for data in members_data]
-        id, owner_id, direction, depart_datetime, status, fee, max_member = group_data
+        id, owner_id, direction, depart_datetime, status, fee, max_member, cost = group_data
         json = {
             'id': id,
             'owner_id': owner_id,
             'direction': direction,
             'depart_datetime': depart_datetime,
             'status': status,
-            'fee': fee,
+            'fee': {
+                'total': fee,
+                'cost': cost,
+            },
             'member': {
                 'current_member': len(members),
                 'max_member': max_member,
@@ -136,12 +139,14 @@ class MySQLTaxiGroupQueryDao:
 
         return json
 
-    def find_group(self, group_id) -> ResponseGroupDetail:
+    def find_group(self, user_id, group_id) -> ResponseGroupDetail:
         group_sql = f'''
-        SELECT g.id, owner_id, direction, depart_datetime, status, fee, max_member
+        SELECT g.id, owner_id, direction, depart_datetime, status, fee, max_member, bt.cost 
         FROM group_table g
         INNER JOIN taxi_group_table t ON g.id = t.group_id
+        LEFT JOIN bill_table bt ON g.id = bt.group_id
         WHERE g.id = {group_id}
+        AND bt.user_id = {user_id}
         '''
 
         cursor = self.connection.cursor()

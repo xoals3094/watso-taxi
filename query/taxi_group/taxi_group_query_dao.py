@@ -45,7 +45,7 @@ class MySQLTaxiGroupQueryDao:
                     LEFT JOIN bill_table bt ON g.id = bt.group_id
                     WHERE status = "COMPLETE"
                     AND depart_datetime >= "{datetime.now() - timedelta(days=90)}"
-                    AND g.id NOT IN (SELECT group_id FROM group_member_table WHERE user_id = {user_id}) 
+                    AND g.id IN (SELECT group_id FROM group_member_table WHERE user_id = {user_id}) 
                     AND bt.user_id = {user_id}
                 '''
 

@@ -13,7 +13,7 @@ class MySQLTaxiGroupQueryDao:
         self.connection = connection
 
     @staticmethod
-    def complete_group_list_mapping(data_list):
+    def costed_group_list_mapping(data_list):
         datas_json = []
         for data in data_list:
             id, owner_id, direction, depart_datetime, status, fee, max_member, current_member, cost = data
@@ -52,7 +52,7 @@ class MySQLTaxiGroupQueryDao:
         cursor = self.connection.cursor()
         cursor.execute(sql)
         datas = cursor.fetchall()
-        datas_json = self.complete_group_list_mapping(datas)
+        datas_json = self.costed_group_list_mapping(datas)
 
         return [ResponseGroupSummary.mapping(json) for json in datas_json]
 
@@ -89,7 +89,7 @@ class MySQLTaxiGroupQueryDao:
                     WHERE is_open = true 
                     AND direction = "{direction}" 
                     AND depart_datetime >= "{depart_datetime}"
-                    AND g.id NOT IN (SELECT group_id FROM group_member_table WHERE user_id = {user_id}) 
+                    AND g.id NOT IN (SELECT group_id FROM group_member_table WHERE user_id = {user_id})
                 '''
 
         cursor = self.connection.cursor()
@@ -101,17 +101,19 @@ class MySQLTaxiGroupQueryDao:
     def find_joined_groups(self, user_id):
         sql = f'''
                     SELECT g.id, owner_id, direction, depart_datetime, status, fee, max_member, 
-                    (SELECT COUNT(group_id) FROM group_member_table WHERE group_id = g.id) AS current_member
+                    (SELECT COUNT(group_id) FROM group_member_table WHERE group_id = g.id) AS current_member, bt.cost 
                     FROM group_table g
                     INNER JOIN taxi_group_table t ON g.id = t.group_id
+                    LEFT JOIN bill_table bt ON g.id = bt.group_id
                     WHERE status != "COMPLETE"
                     AND g.id IN (SELECT group_id FROM group_member_table WHERE user_id = {user_id}) 
+                    AND bt.user_id = {user_id}
                 '''
 
         cursor = self.connection.cursor()
         cursor.execute(sql)
         datas = cursor.fetchall()
-        datas_json = self.group_list_mapping(datas)
+        datas_json = self.costed_group_list_mapping(datas)
         return [ResponseGroupSummary.mapping(json) for json in datas_json]
 
     @staticmethod

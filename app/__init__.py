@@ -23,6 +23,9 @@ def create_app():
     from app.api.taxi_group.taxi_api import taxi_router
     api.include_router(taxi_router)
 
+    from app.api.taxi_group.chatting import ws_router
+    api.include_router(ws_router)
+
     from app.api.auth.auth import auth_router
     api.include_router(auth_router)
 

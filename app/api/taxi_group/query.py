@@ -34,7 +34,7 @@ class ResponseTaxiGroupModel(BaseModel):
     status: str = Field(..., description='상태 코드', examples=['OPEN'])
     direction: str = Field(..., description='방면', examples=['CAMPUS'])
     depart_datetime: datetime = Field(..., description='출발 시간', examples=[datetime.now().strftime('%Y-%m-%dT%H:%M:%S')])
-    fee: int = Field(..., description='비용', examples=['6200'])
+    fee: ResponseFeeModel
     member: MemberModel
 
 
@@ -99,8 +99,9 @@ async def get_taxi_groups(option: GroupQueryOption = Query(None, description='�
 @taxi_router.get('/{group_id}', response_model=ResponseTaxiGroupModel, tags=['taxi-query'])
 @inject
 async def get_taxi_group_detail(group_id: int,
+                                user_id: int = Depends(get_user_id),
                                 group_query: MySQLTaxiGroupQueryDao = Depends(Provide[TaxiContainer.taxi_group_query_dao])):
-    group = group_query.find_group(group_id)
+    group = group_query.find_group(user_id, group_id)
     return group.json
 
 

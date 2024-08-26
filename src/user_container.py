@@ -6,7 +6,8 @@ from domain.user.application.user_service import UserService
 
 
 class UserContainer(containers.DeclarativeContainer):
-    wiring_config = containers.WiringConfiguration(modules=['app.api.user.user'])
+    wiring_config = containers.WiringConfiguration(modules=['app.api.user.user',
+                                                            'app.api.taxi_group.chatting'])
     connection = providers.Singleton(
         connect,
         host=mysql.host,

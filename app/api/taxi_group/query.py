@@ -15,7 +15,6 @@ from app.api.taxi_group.taxi_api import taxi_router
 class MemberModel(BaseModel):
     current_member: int = Field(..., description='현재 인원', examples=[1])
     max_member: int = Field(..., description='최대 인원', examples=[4])
-    members: List[int] = Field(..., description='참여자 ID 목록', examples=[[1719843797268]])
 
 
 class MemBerSummaryModel(BaseModel):
@@ -30,7 +29,6 @@ class ResponseFeeModel(BaseModel):
 
 class ResponseTaxiGroupModel(BaseModel):
     id: int = Field(..., description='그룹 ID', examples=[1719843797268])
-    owner_id: int = Field(..., description='대표유저 ID', examples=[1719843797268])
     status: str = Field(..., description='상태 코드', examples=['OPEN'])
     direction: str = Field(..., description='방면', examples=['CAMPUS'])
     depart_datetime: datetime = Field(..., description='출발 시간', examples=[datetime.now().strftime('%Y-%m-%dT%H:%M:%S')])
@@ -38,14 +36,14 @@ class ResponseTaxiGroupModel(BaseModel):
     member: MemberModel
 
 
-class ResponseTaxiGroupSummaryModel(BaseModel):
+class ResponseTaxiGroupDetailModel(BaseModel):
     id: int = Field(..., description='그룹 ID', examples=[1719843797268])
-    owner_id: int = Field(..., description='대표유저 ID', examples=[1719843797268])
+    role: str = Field(..., description='권한', examples=['OWNER'])
     status: str = Field(..., description='상태 코드', examples=['OPEN'])
     direction: str = Field(..., description='방면', examples=['CAMPUS'])
     depart_datetime: datetime = Field(..., description='출발 시간', examples=[datetime.now().strftime('%Y-%m-%dT%H:%M:%S')])
     fee: ResponseFeeModel
-    member: MemBerSummaryModel
+    member: MemberModel
 
 
 class ResponseUser(BaseModel):
@@ -77,7 +75,7 @@ class Direction(str, Enum):
     CAMPUS = 'CAMPUS'
 
 
-@taxi_router.get('', response_model=List[ResponseTaxiGroupSummaryModel], tags=['taxi-query'])
+@taxi_router.get('', response_model=List[ResponseTaxiGroupModel], tags=['taxi-query'])
 @inject
 async def get_taxi_groups(option: GroupQueryOption = Query(None, description='조회 옵션'),
                           direction: Direction = Query(None, description='조회할 방향'),
@@ -96,13 +94,13 @@ async def get_taxi_groups(option: GroupQueryOption = Query(None, description='�
     return [group.json for group in groups]
 
 
-@taxi_router.get('/{group_id}', response_model=ResponseTaxiGroupModel, tags=['taxi-query'])
+@taxi_router.get('/{group_id}', response_model=ResponseTaxiGroupDetailModel, tags=['taxi-query'])
 @inject
 async def get_taxi_group_detail(group_id: int,
                                 user_id: int = Depends(get_user_id),
                                 group_query: MySQLTaxiGroupQueryDao = Depends(Provide[TaxiContainer.taxi_group_query_dao])):
     group = group_query.find_group(user_id, group_id)
-    return group.json
+    return group.get_json_detail(user_id)
 
 
 @taxi_router.get('/{group_id}/fee', response_model=ResponseBills, tags=['taxi-query'])

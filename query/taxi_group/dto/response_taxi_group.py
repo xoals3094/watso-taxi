@@ -1,24 +1,21 @@
 from datetime import datetime
-from typing import List
 
 
 class Member:
-    def __init__(self, current_member: int, max_member: int, members: List[int]):
+    def __init__(self, current_member: int, max_member: int):
         self.current_member = current_member
         self.max_member = max_member
-        self.members = members
 
     @property
     def json(self):
         return {
             'current_member': self.current_member,
             'max_member': self.max_member,
-            'members': self.members
         }
 
     @staticmethod
     def mapping(json):
-        return Member(current_member=json['current_member'], max_member=json['max_member'], members=json['members'])
+        return Member(current_member=json['current_member'], max_member=json['max_member'])
 
 
 class Fee:
@@ -38,7 +35,7 @@ class Fee:
         return Fee(total=json['total'], cost=json['cost'])
 
 
-class ResponseGroupDetail:
+class ResponseTaxiGroup:
     def __init__(self,
                  id: str,
                  owner_id: int,
@@ -55,11 +52,15 @@ class ResponseGroupDetail:
         self.fee = fee
         self.member = member
 
+    def get_json_detail(self, user_id):
+        json = self.json
+        json['role'] = 'OWNER' if user_id == self.owner_id else 'NORMAL'
+        return json
+
     @property
     def json(self):
         return {
             'id': self.id,
-            'owner_id': self.owner_id,
             'direction': self.direction,
             'depart_datetime': self.depart_datetime,
             'status': self.status,
@@ -71,10 +72,10 @@ class ResponseGroupDetail:
     def mapping(json):
         member = Member.mapping(json['member'])
         fee = Fee.mapping(json['fee'])
-        return ResponseGroupDetail(id=json['id'],
-                                   owner_id=json['owner_id'],
-                                   direction=json['direction'],
-                                   depart_datetime=json['depart_datetime'],
-                                   status=json['status'],
-                                   fee=fee,
-                                   member=member)
+        return ResponseTaxiGroup(id=json['id'],
+                                 owner_id=json['owner_id'],
+                                 direction=json['direction'],
+                                 depart_datetime=json['depart_datetime'],
+                                 status=json['status'],
+                                 fee=fee,
+                                 member=member)

@@ -1,13 +1,10 @@
-from pymysql import connect
+from domain.database import MySqlDatabase
 
 
-class MySQLKakaoPayDao:
-    def __init__(self, connection: connect):
-        self.connection = connection
-
+class MySQLKakaoPayDao(MySqlDatabase):
     def find_kakao_pay_user_id_by_user_id(self, user_id) -> str:
         sql = 'SELECT kakao_pay_id FROM kakao_pay_table WHERE user_id = %s'
-        cursor = self.connection.cursor()
+        cursor = self.mysql_connection.cursor()
 
         cursor.execute(sql, user_id)
 

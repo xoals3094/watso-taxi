@@ -8,7 +8,7 @@ from domain.user.application.user_service import UserService
 class UserContainer(containers.DeclarativeContainer):
     wiring_config = containers.WiringConfiguration(modules=['app.api.user.user',
                                                             'app.api.taxi_group.chatting'])
-    connection = providers.Singleton(
+    mysql_connection = providers.Singleton(
         connect,
         host=mysql.host,
         user=mysql.user,
@@ -17,5 +17,5 @@ class UserContainer(containers.DeclarativeContainer):
         database=mysql.database
     )
 
-    user_dao = providers.Singleton(MySQLUserDao, mysql_connection=connection)
+    user_dao = providers.Singleton(MySQLUserDao, mysql_connection=mysql_connection)
     user_service = providers.Singleton(UserService, user_dao=user_dao)

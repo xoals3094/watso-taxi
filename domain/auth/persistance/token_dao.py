@@ -1,18 +1,15 @@
-from pymysql import connect
+from domain.database import MySqlDatabase
 from domain.auth.exception import persistence
 
 
-class MySQLTokenDao:
-    def __init__(self, connection: connect):
-        self.connection = connection
-
+class MySQLTokenDao(MySqlDatabase):
     def find_user_id_by_refresh_token(self, refresh_token) -> int:
         sql = f'''
         SELECT user_id
         FROM token_table
         WHERE refresh_token = "{refresh_token}"'''
 
-        cursor = self.connection.cursor()
+        cursor = self.mysql_connection.cursor()
         cursor.execute(sql)
         data = cursor.fetchone()
         if data is None:
@@ -28,16 +25,16 @@ class MySQLTokenDao:
         (user_id, access_token, refresh_token)
         VALUE({user_id}, "{access_token}", "{refresh_token}")'''
 
-        cursor = self.connection.cursor()
+        cursor = self.mysql_connection.cursor()
         cursor.execute(sql)
 
-        self.connection.commit()
+        self.mysql_connection.commit()
 
     def delete(self, refresh_token):
         sql = f'DELETE FROM token_table WHERE refresh_token = %s'
-        cursor = self.connection.cursor()
+        cursor = self.mysql_connection.cursor()
         cursor.execute(sql, refresh_token)
-        self.connection.commit()
+        self.mysql_connection.commit()
 
     def update_access_token(self, user_id, access_token):
         sql = f'''
@@ -45,10 +42,10 @@ class MySQLTokenDao:
         SET access_token = "{access_token}" 
         WHERE user_id = {user_id}'''
 
-        cursor = self.connection.cursor()
+        cursor = self.mysql_connection.cursor()
         cursor.execute(sql)
 
-        self.connection.commit()
+        self.mysql_connection.commit()
 
     def update_both(self, user_id, access_token, refresh_token):
         sql = f'''
@@ -57,7 +54,7 @@ class MySQLTokenDao:
         refresh_token = "{refresh_token}" 
         WHERE user_id = {user_id}'''
 
-        cursor = self.connection.cursor()
+        cursor = self.mysql_connection.cursor()
         cursor.execute(sql)
 
-        self.connection.commit()
+        self.mysql_connection.commit()

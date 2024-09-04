@@ -17,7 +17,7 @@ class TaxiContainer(containers.DeclarativeContainer):
                                                             'app.api.taxi_group.query',
                                                             'domain.taxi_group.owner_permission.owner_permission'])
 
-    connection = providers.Singleton(
+    mysql_connection = providers.Singleton(
         connect,
         host=mysql.host,
         user=mysql.user,
@@ -25,12 +25,12 @@ class TaxiContainer(containers.DeclarativeContainer):
         port=mysql.port,
         database=mysql.database
     )
-    owner_dao = providers.Singleton(MySQLOwnerDao, connection=connection)
+    owner_dao = providers.Singleton(MySQLOwnerDao, mysql_connection=mysql_connection)
 
-    group_repository = providers.Singleton(MySQLGroupRepository, connection=connection)
-    taxi_group_repository = providers.Singleton(MySQLTaxiGroupRepository, connection=connection)
-    taxi_group_query_dao = providers.Singleton(MySQLTaxiGroupQueryDao, connection=connection)
-    bill_dao = providers.Singleton(MySQLBillDao, connection=connection)
+    group_repository = providers.Singleton(MySQLGroupRepository, mysql_connection=mysql_connection)
+    taxi_group_repository = providers.Singleton(MySQLTaxiGroupRepository, mysql_connection=mysql_connection)
+    taxi_group_query_dao = providers.Singleton(MySQLTaxiGroupQueryDao, mysql_connection=mysql_connection)
+    bill_dao = providers.Singleton(MySQLBillDao, mysql_connection=mysql_connection)
 
     group_service = providers.Singleton(GroupService, group_repository=group_repository)
     taxi_group_service = providers.Singleton(

@@ -1,12 +1,9 @@
 from exceptions import query
-from pymysql import connect
+from domain.database import MySqlDatabase
 from domain.group.entity.group import Group
 
 
-class MySQLGroupRepository:
-    def __init__(self, connection: connect):
-        self.connection = connection
-
+class MySQLGroupRepository(MySqlDatabase):
     def find_group_by_id(self, group_id: int) -> Group:
         group_sql = f'''
         SELECT id, owner_id, is_open, max_member 
@@ -14,7 +11,7 @@ class MySQLGroupRepository:
         WHERE id = {group_id}
         '''
 
-        cursor = self.connection.cursor()
+        cursor = self.mysql_connection.cursor()
 
         cursor.execute(group_sql)
         group_data = cursor.fetchone()
@@ -57,12 +54,12 @@ class MySQLGroupRepository:
         VALUE({group.id}, {group.member.members[0]}) 
         '''
 
-        cursor = self.connection.cursor()
+        cursor = self.mysql_connection.cursor()
 
         cursor.execute(group_sql)
         cursor.execute(group_member_sql)
 
-        self.connection.commit()
+        self.mysql_connection.commit()
         cursor.close()
 
     def update_is_open(self, group_id: int, is_open: bool):
@@ -71,9 +68,9 @@ class MySQLGroupRepository:
         SET is_open = {is_open} 
         WHERE id = {group_id}'''
 
-        cursor = self.connection.cursor()
+        cursor = self.mysql_connection.cursor()
         cursor.execute(sql)
-        self.connection.commit()
+        self.mysql_connection.commit()
 
         cursor.close()
 
@@ -82,9 +79,9 @@ class MySQLGroupRepository:
         INSERT INTO group_member_table 
         (group_id, user_id) VALUE({group_id}, {user_id})'''
 
-        cursor = self.connection.cursor()
+        cursor = self.mysql_connection.cursor()
         cursor.execute(sql)
-        self.connection.commit()
+        self.mysql_connection.commit()
 
         cursor.close()
 
@@ -93,9 +90,9 @@ class MySQLGroupRepository:
         DELETE FROM group_member_table 
         WHERE group_id = {group_id} and user_id = {user_id}'''
 
-        cursor = self.connection.cursor()
+        cursor = self.mysql_connection.cursor()
         cursor.execute(sql)
-        self.connection.commit()
+        self.mysql_connection.commit()
 
         cursor.close()
 

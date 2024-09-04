@@ -9,7 +9,7 @@ from domain.auth.application.kakao_login_service import KakaoLoginService
 
 class AuthContainer(containers.DeclarativeContainer):
     wiring_config = containers.WiringConfiguration(modules=['app.api.auth.auth'])
-    connection = providers.Singleton(
+    mysql_connection = providers.Singleton(
         connect,
         host=mysql.host,
         user=mysql.user,
@@ -18,8 +18,8 @@ class AuthContainer(containers.DeclarativeContainer):
         database=mysql.database
     )
 
-    user_dao = providers.Singleton(MySQLUserDao, connection=connection)
-    token_dao = providers.Singleton(MySQLTokenDao, connection=connection)
+    user_dao = providers.Singleton(MySQLUserDao, mysql_connection=mysql_connection)
+    token_dao = providers.Singleton(MySQLTokenDao, mysql_connection=mysql_connection)
 
     kakao_service = providers.Singleton(KakaoLoginService, user_dao=user_dao, token_dao=token_dao)
     jwt_login_service = providers.Singleton(JWTLoginService, token_dao=token_dao)

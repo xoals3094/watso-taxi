@@ -1,4 +1,4 @@
-from pymysql import connect
+from domain.database import MySqlDatabase
 from typing import List
 from domain.taxi_group.entity.status import Status
 from query.taxi_group.dto.response_taxi_group import ResponseTaxiGroup
@@ -7,10 +7,7 @@ from exceptions import query
 from datetime import datetime, timedelta
 
 
-class MySQLTaxiGroupQueryDao:
-    def __init__(self, connection: connect):
-        self.connection = connection
-
+class MySQLTaxiGroupQueryDao(MySqlDatabase):
     def find_complete_groups(self, user_id) -> List[ResponseTaxiGroup]:
         sql = f'''
                     SELECT g.id, owner_id, direction, depart_datetime, status, fee, bt.cost, max_member,
@@ -24,7 +21,7 @@ class MySQLTaxiGroupQueryDao:
                     AND bt.user_id = {user_id}
                 '''
 
-        cursor = self.connection.cursor()
+        cursor = self.mysql_connection.cursor()
         cursor.execute(sql)
         datas = cursor.fetchall()
         json_list = [
@@ -60,7 +57,7 @@ class MySQLTaxiGroupQueryDao:
                     AND g.id NOT IN (SELECT group_id FROM group_member_table WHERE user_id = {user_id})
                 '''
 
-        cursor = self.connection.cursor()
+        cursor = self.mysql_connection.cursor()
         cursor.execute(sql)
         datas = cursor.fetchall()
         json_list = [
@@ -95,7 +92,7 @@ class MySQLTaxiGroupQueryDao:
                     AND bt.user_id = {user_id}
                 '''
 
-        cursor = self.connection.cursor()
+        cursor = self.mysql_connection.cursor()
         cursor.execute(sql)
         datas = cursor.fetchall()
         json_list = [
@@ -129,7 +126,7 @@ class MySQLTaxiGroupQueryDao:
         AND bt.user_id = {user_id}
         '''
 
-        cursor = self.connection.cursor()
+        cursor = self.mysql_connection.cursor()
         cursor.execute(group_sql)
         data = cursor.fetchone()
         if data is None:
@@ -175,7 +172,7 @@ class MySQLTaxiGroupQueryDao:
         INNER JOIN user_table u ON b.user_id = u.id
         WHERE group_id = %s'''
 
-        cursor = self.connection.cursor()
+        cursor = self.mysql_connection.cursor()
         cursor.execute(bill_sql, group_id)
         bill_datas = cursor.fetchall()
 

@@ -1,15 +1,12 @@
-from pymysql import connect
+from domain.database import MySqlDatabase
 from domain.taxi_group.entity.taxi_group import TaxiGroup
 from domain.taxi_group.entity.status import Status
 from exceptions import query
 
 
-class MySQLTaxiGroupRepository:
-    def __init__(self, connection: connect):
-        self.connection = connection
-
+class MySQLTaxiGroupRepository(MySqlDatabase):
     def find_taxi_group_by_id(self, group_id) -> TaxiGroup:
-        cursor = self.connection.cursor()
+        cursor = self.mysql_connection.cursor()
         sql = f'''
         SELECT group_id, fee, status, depart_datetime, direction
         FROM taxi_group_table
@@ -35,7 +32,7 @@ class MySQLTaxiGroupRepository:
         return TaxiGroup.mapping(json)
 
     def save(self, taxi_group: TaxiGroup):
-        cursor = self.connection.cursor()
+        cursor = self.mysql_connection.cursor()
 
         sql = f'''
         INSERT INTO taxi_group_table
@@ -43,27 +40,27 @@ class MySQLTaxiGroupRepository:
         VALUE({taxi_group.group_id}, {taxi_group.fee}, "{taxi_group.status}", "{taxi_group.depart_datetime}", "{taxi_group.direction}")
         '''
         cursor.execute(sql)
-        self.connection.commit()
+        self.mysql_connection.commit()
         cursor.close()
 
     def update_status(self, group_id: int, status: Status):
-        cursor = self.connection.cursor()
+        cursor = self.mysql_connection.cursor()
         sql = f'''
         UPDATE taxi_group_table
         SET status = "{status}"
         WHERE group_id = {group_id}'''
 
         cursor.execute(sql)
-        self.connection.commit()
+        self.mysql_connection.commit()
         cursor.close()
 
     def update_fee(self, group_id: int, fee: int):
-        cursor = self.connection.cursor()
+        cursor = self.mysql_connection.cursor()
         sql = f'''
         UPDATE taxi_group_table
         SET fee = {fee}
         WHERE group_id = {group_id}'''
 
         cursor.execute(sql)
-        self.connection.commit()
+        self.mysql_connection.commit()
         cursor.close()

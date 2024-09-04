@@ -1,15 +1,12 @@
-from pymysql import connect
+from domain.database import MySqlDatabase
 from domain.user.dto.response_user import ResponseUser
 from exceptions import query
 
 
-class MySQLUserDao:
-    def __init__(self, mysql_connection: connect):
-        self.connection = mysql_connection
-
+class MySQLUserDao(MySqlDatabase):
     def find_user_by_id(self, user_id) -> ResponseUser:
         sql = 'SELECT id, nickname, profile_image_url FROM user_table WHERE id = %s'
-        cursor = self.connection.cursor()
+        cursor = self.mysql_connection.cursor()
         cursor.execute(sql, user_id)
         data = cursor.fetchone()
         if data is None:

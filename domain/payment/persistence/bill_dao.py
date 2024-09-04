@@ -1,15 +1,12 @@
-from pymysql import connect
+from domain.database import MySqlDatabase
 from exceptions import query
 
 
-class MySQLBillDao:
-    def __init__(self, connection: connect):
-        self.connection = connection
-
+class MySQLBillDao(MySqlDatabase):
     def find_cost(self, group_id: int, user_id: int) -> int:
         sql = 'SELECT cost FROM bill_table WHERE group_id = %s AND user_id = %s'
 
-        cursor = self.connection.cursor()
+        cursor = self.mysql_connection.cursor()
         cursor.execute(sql, (group_id, user_id))
 
         data = cursor.fetchone()

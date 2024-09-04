@@ -1,13 +1,10 @@
-from pymysql import connect
+from domain.database import MySqlDatabase
 from exceptions import query
 
 
-class MySQLOwnerDao:
-    def __init__(self, connection: connect):
-        self.connection = connection
-
+class MySQLOwnerDao(MySqlDatabase):
     def find_owner_id_by_group_id(self, group_id) -> int:
-        cursor = self.connection.cursor()
+        cursor = self.mysql_connection.cursor()
         sql = f'''
         SELECT owner_id
         FROM group_table

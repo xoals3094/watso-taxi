@@ -11,8 +11,9 @@ def create_access_token(user_id):
     return jwt.encode(payload, secret_key)
 
 
-def create_refresh_token():
+def create_refresh_token(token_id):
     payload = {
+        'token_id': token_id,
         'exp': datetime.utcnow() + timedelta(days=90)
     }
     return jwt.encode(payload, secret_key)

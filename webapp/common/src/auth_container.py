@@ -2,10 +2,10 @@ from dependency_injector.containers import DeclarativeContainer, WiringConfigura
 from dependency_injector.providers import Factory, Resource
 from webapp.common import database
 
-from webapp.domain.auth.persistance.user_dao import MySQLUserDao
-from webapp.domain.auth.persistance.token_dao import MySQLTokenDao
-from webapp.domain.auth.application.jwt_login_service import JWTLoginService
-from webapp.domain.auth.application.kakao_login_service import KakaoLoginService
+from webapp.domain.auth.persistance.user_repository import UserRepository
+from webapp.domain.auth.persistance.token_repository import TokenRepository
+from webapp.domain.auth.persistance.kakao_repository import KakaoRepository
+from webapp.domain.auth.application.auth_service import AuthService
 
 
 class AuthContainer(DeclarativeContainer):
@@ -13,8 +13,8 @@ class AuthContainer(DeclarativeContainer):
 
     mysql_connection = Resource(database.get_connection)
 
-    user_dao = Factory(MySQLUserDao, mysql_connection=mysql_connection)
-    token_dao = Factory(MySQLTokenDao, mysql_connection=mysql_connection)
+    user_repository = Factory(UserRepository, mysql_connection=mysql_connection)
+    kakao_repository = Factory(KakaoRepository, mysql_connection=mysql_connection)
+    token_repository = Factory(TokenRepository, mysql_connection=mysql_connection)
 
-    kakao_service = Factory(KakaoLoginService, user_dao=user_dao, token_dao=token_dao)
-    jwt_login_service = Factory(JWTLoginService, token_dao=token_dao)
+    auth_service = Factory(AuthService, user_repository=user_repository, token_repository=token_repository)

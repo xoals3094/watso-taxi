@@ -14,7 +14,7 @@ pyjwt = "*"
 bcrypt = "*"
 python-multipart = "*"
 multipledispatch = "*"
-SQL
+sqlalchemy="*"
 bson = "*"
 
 [dev-packages]

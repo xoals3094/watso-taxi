@@ -1,11 +1,15 @@
-from webapp.domain.user.persistance.user_dao import MySQLUserDao
-from webapp.domain.user.dto.response_user import ResponseUser
+from webapp.domain.user.persistance.user_repository import UserRepository
+from webapp.endpoint.models.user import User
 
 
 class UserService:
-    def __init__(self, user_dao: MySQLUserDao):
-        self.user_dao = user_dao
+    def __init__(self, user_repository: UserRepository):
+        self.user_repository = user_repository
 
-    def get_user(self, user_id) -> ResponseUser:
-        user = self.user_dao.find_user_by_id(user_id)
-        return user
+    def get_user(self, user_id) -> User:
+        user = self.user_repository.find_by_id(user_id)
+        return User(
+            id=user.id,
+            nickname=user.nickname,
+            profile_image_url=user.profile_image_url
+        )

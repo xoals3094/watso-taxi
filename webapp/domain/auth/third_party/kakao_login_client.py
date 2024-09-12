@@ -12,7 +12,8 @@ def get_user_info(access_token) -> KakaoUserInfo:
     res = requests.get(url, headers=header)
     json = res.json()
     kakao_account = json['kakao_account']
-    return KakaoUserInfo(id=json['id'],
-                         nickname=kakao_account['profile']['nickname'],
-                         profile_image_url=kakao_account['profile']['profile_image_url'])
-
+    return KakaoUserInfo(
+        id=json['id'],
+        nickname=kakao_account['profile']['nickname'],
+        profile_image_url=kakao_account['profile']['profile_image_url']
+    )

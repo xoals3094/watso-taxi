@@ -1,2 +1,0 @@
-class ResourceNotFound(Exception):
-    pass

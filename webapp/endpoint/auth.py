@@ -1,8 +1,7 @@
 from fastapi import APIRouter, Depends, status
 from dependency_injector.wiring import inject, Provide
 
-from webapp.domain.auth.application.kakao_login_service import KakaoLoginService
-from webapp.domain.auth.application.jwt_login_service import JWTLoginService
+from webapp.domain.auth.application.auth_service import AuthService
 from webapp.common.src.auth_container import AuthContainer
 
 from .models.auth import (
@@ -11,7 +10,7 @@ from .models.auth import (
 )
 
 
-auth_router = APIRouter(prefix='/auth')
+auth_router = APIRouter()
 
 
 @auth_router.delete(
@@ -21,9 +20,10 @@ auth_router = APIRouter(prefix='/auth')
 @inject
 async def logout(
         req: RefreshToken,
-        jwt_login_service: JWTLoginService = Depends(Provide[AuthContainer.jwt_login_service])
-):
-    jwt_login_service.logout(req.refresh_token)
+        auth_service: AuthService = Depends(Provide[AuthContainer.auth_service])
+) -> None:
+
+    auth_service.logout(req.refresh_token)
 
 
 @auth_router.post(
@@ -33,10 +33,10 @@ async def logout(
 @inject
 async def refresh(
         req: RefreshToken,
-        jwt_login_service: JWTLoginService = Depends(Provide[AuthContainer.jwt_login_service])
+        auth_service: AuthService = Depends(Provide[AuthContainer.auth_service])
 ) -> TokenPair:
-    access_token, refresh_token = jwt_login_service.refresh(req.refresh_token)
 
+    access_token, refresh_token = auth_service.refresh(req.refresh_token)
     return TokenPair(
         access_token=access_token,
         refresh_token=refresh_token
@@ -49,18 +49,12 @@ async def refresh(
 )
 @inject
 async def kakao_login(
-        access_token: str,
-        kakao_service: KakaoLoginService = Depends(Provide[AuthContainer.kakao_service])
-):
-    access_token, refresh_token = kakao_service.login(access_token)
+        code: str,
+        auth_service: AuthService = Depends(Provide[AuthContainer.auth_service])
+) -> TokenPair:
+
+    access_token, refresh_token = auth_service.login(code)
     return TokenPair(
         access_token=access_token,
         refresh_token=refresh_token
     )
-
-
-@auth_router.get('/login/kakao/callback', include_in_schema=False)
-async def login_kakao_callback(code: str = None):
-    return
-
-

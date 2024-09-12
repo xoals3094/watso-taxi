@@ -2,7 +2,7 @@ import starlette.websockets
 from fastapi import WebSocket, APIRouter, Query
 from webapp.common.util.token_decoder import decode_token
 from webapp.common.exceptions import auth
-from webapp.domain.user.persistance.user_dao import MySQLUserDao
+from webapp.domain.user.persistance.user_repository import UserRepository
 from webapp.common.src.user_container import UserContainer
 
 
@@ -36,14 +36,14 @@ ws_router = APIRouter(prefix='/taxi')
 async def websocket_endpoint(group_id: str,
                              websocket: WebSocket,
                              token: str = Query(),
-                             db: MySQLUserDao = UserContainer.user_dao):
+                             db: UserRepository = UserContainer.user_dao):
     try:
         user_id = int(decode_token(token)['id'])
     except auth.TokenExpired:
         await websocket.close(1008, 'Unauthorized')
         return
 
-    user = db.find_user_by_id(user_id)
+    user = db.find_by_id(user_id)
 
     await manager.connect(group_id, websocket)
     try:

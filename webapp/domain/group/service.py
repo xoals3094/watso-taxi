@@ -1,36 +1,23 @@
-from webapp.domain.group.group import Group
-from webapp.domain.group.repository import MySQLGroupRepository
+from abc import *
 
 
-class GroupService:
-    def __init__(self, group_repository: MySQLGroupRepository):
-        self.group_repository = group_repository
+class GroupService(metaclass=ABCMeta):
+    @abstractmethod
+    def create(self, *args, **kwargs) -> int:
+        pass
 
-    def create(self, owner_id: int, max_member: int) -> int:
-        group = Group.create(owner_id=owner_id, max_member=max_member)
-        self.group_repository.save(group)
-        return group.id
-
-    def delete(self, group_id: int):
-        group = self.group_repository.find_group_by_id(group_id)
-        self.group_repository.delete(group.id)
-
+    @abstractmethod
     def open(self, group_id: int):
-        group = self.group_repository.find_group_by_id(group_id)
-        group.open()
-        self.group_repository.update_is_open(group.id, group.is_open)
+        pass
 
+    @abstractmethod
     def close(self, group_id: int):
-        group = self.group_repository.find_group_by_id(group_id)
-        group.close()
-        self.group_repository.update_is_open(group.id, group.is_open)
+        pass
 
+    @abstractmethod
     def participate(self, group_id: int, user_id: int):
-        group = self.group_repository.find_group_by_id(group_id)
-        group.participate(user_id)
-        self.group_repository.append_member(group_id, user_id)
+        pass
 
+    @abstractmethod
     def leave(self, group_id: int, user_id: int):
-        group = self.group_repository.find_group_by_id(group_id)
-        group.leave(user_id)
-        self.group_repository.delete_member(group_id, user_id)
+        pass

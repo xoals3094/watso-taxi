@@ -2,6 +2,7 @@ from fastapi import FastAPI
 
 from webapp.endpoint.auth import auth_router
 from webapp.endpoint.taxi import taxi_router
+from webapp.endpoint.user import user_router
 from webapp.common.src.auth_container import AuthContainer
 from webapp.common.src.taxi_container import TaxiContainer
 
@@ -15,6 +16,7 @@ def create_app():
     app.taxi_container = taxi_container
 
     app.include_router(auth_router, prefix='/auth', tags=['auth'])
+    app.include_router(user_router, prefix='/user', tags=['user'])
     app.include_router(taxi_router, prefix='/taxi', tags=['taxi'])
 
     return app

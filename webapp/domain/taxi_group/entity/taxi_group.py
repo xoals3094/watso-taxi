@@ -1,6 +1,8 @@
 from datetime import datetime
+from sqlalchemy import Column, Integer, String, DateTime, ForeignKey
+from sqlalchemy.orm import relationship
+
 from webapp.common.util.id_generator import create_id
-from webapp.common.schema.models import TaxiGroupModel, TaxiGroupMemberModel
 from webapp.common.exceptions import domain
 from webapp.domain.group.group import Group, Member
 from webapp.domain.taxi_group.entity.status import Status
@@ -10,11 +12,24 @@ from webapp.domain.taxi_group.entity.direction import Direction
 DEFAULT_TAXI_FARE = 6200
 
 
-class TaxiGroupMember(TaxiGroupMemberModel, Member):
-    pass
+class TaxiGroupMember(Member):
+    __tablename__ = 'taxi_group_members'
+
+    id = Column(String(32), ForeignKey('members.id'), primary_key=True)
+    cost = Column(Integer, nullable=False)
 
 
-class TaxiGroup(TaxiGroupModel, Group):
+class TaxiGroup(Group):
+    __tablename__ = 'taxi_groups'
+
+    id = Column(String(32), ForeignKey('groups.id'), primary_key=True)
+    fare = Column(Integer, nullable=False)
+    status = Column(String(20), nullable=False)
+    departure_datetime = Column(DateTime, nullable=False)
+    direction = Column(String(20), nullable=False)
+
+    members = relationship('TaxiGroupMember')
+
     def _set_status(self, status):
         Status(self.status).to(status)
         self.status = status

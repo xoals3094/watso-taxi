@@ -51,22 +51,3 @@ class MemberModel(Base):
     id = Column(String(32), primary_key=True)
     group_id = Column(String(32), ForeignKey('groups.id'))
     user_id = Column(String(32), ForeignKey('users.id'))
-
-
-class TaxiGroupMemberModel(MemberModel):
-    __tablename__ = 'taxi_group_members'
-
-    id = Column(String(32), ForeignKey('members.id'), primary_key=True)
-    cost = Column(Integer, nullable=False)
-
-
-class TaxiGroupModel(GroupModel):
-    __tablename__ = 'taxi_groups'
-
-    id = Column(String(32), ForeignKey('groups.id'), primary_key=True)
-    fare = Column(Integer, nullable=False)
-    status = Column(String(20), nullable=False)
-    departure_datetime = Column(DateTime, nullable=False)
-    direction = Column(String(20), nullable=False)
-
-    members = relationship('TaxiGroupMemberModel')

@@ -2,6 +2,6 @@ from pydantic import BaseModel
 
 
 class User(BaseModel):
-    id: int
+    id: str
     nickname: str
     profile_image_url: str

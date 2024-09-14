@@ -14,8 +14,8 @@ class QueryService:
 
     def get_taxi_group(
             self,
-            group_id: int,
-            user_id: int
+            group_id: str,
+            user_id: str
     ) -> TaxiGroup:
 
         pass
@@ -24,7 +24,7 @@ class QueryService:
             self,
             option: GroupQueryOption,
             direction: Direction,
-            user_id: int,
+            user_id: str,
             departure_datetime: datetime
     ) -> list[TaxiGroup]:
 
@@ -32,7 +32,7 @@ class QueryService:
 
     def get_fare(
             self,
-            group_id: int
+            group_id: str
     ) -> FareDetail:
 
         pass

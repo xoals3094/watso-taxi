@@ -17,7 +17,7 @@ def decode_token(token):
     return payload
 
 
-def get_token_id_and_exp(token) -> (int, datetime):
+def get_token_id_and_exp(token) -> (str, datetime):
     payload = decode_token(token)
     token_id = payload['token_id']
     exp = payload['exp']
@@ -27,4 +27,4 @@ def get_token_id_and_exp(token) -> (int, datetime):
 
 def get_user_id(token=Depends(oauth2_scheme)):
     data = decode_token(token)
-    return int(data['id'])
+    return data['id']

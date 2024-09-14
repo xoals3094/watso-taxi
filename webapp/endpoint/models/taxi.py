@@ -2,6 +2,7 @@ from pydantic import BaseModel, Field
 from datetime import datetime
 from typing import List
 from enum import Enum
+from webapp.common.util.id_generator import create_id
 
 
 class GroupQueryOption(str, Enum):
@@ -23,12 +24,12 @@ class TaxiGroupCreate(BaseModel):
 
 
 class GroupId(BaseModel):
-    group_id: int = Field(..., description='생성된 게시글 ID', examples=[1232415])
+    group_id: str = Field(..., description='생성된 게시글 ID', examples=[create_id()])
 
 
 class FareUpdate(BaseModel):
     class Member(BaseModel):
-        id: int = Field(..., description='유저 ID', examples=[1232415])
+        id: str = Field(..., description='유저 ID', examples=[create_id()])
         cost: int = Field(..., description=' 비용', examples=[3000])
 
     fare: int = Field(..., description='비용', examples=[6200])
@@ -44,7 +45,7 @@ class TaxiGroup(BaseModel):
         current_member: int = Field(..., description='현재 인원', examples=[1])
         max_member: int = Field(..., description='최대 인원', examples=[4])
 
-    id: int = Field(..., description='그룹 ID', examples=[1719843797268])
+    id: str = Field(..., description='그룹 ID', examples=[create_id()])
     role: str = Field(..., description='권한', examples=['OWNER', 'NORMAL'])
     status: str = Field(..., description='상태 코드', examples=['OPEN', 'CLOSE', 'SETTLE', 'COMPLETE'])
     direction: Direction
@@ -55,7 +56,7 @@ class TaxiGroup(BaseModel):
 
 class FareDetail(BaseModel):
     class TaxiMember(BaseModel):
-        id: int = Field(..., description='유저 ID', examples=[1719843797268])
+        id: str = Field(..., description='유저 ID', examples=[create_id()])
         nickname: str = Field(..., description='닉네임', examples=['찰봉'])
         cost: int = Field(..., description='비용', examples=[3000])
 

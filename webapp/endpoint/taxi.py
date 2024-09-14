@@ -2,11 +2,11 @@ from fastapi import APIRouter, Depends, Query, status
 from dependency_injector.wiring import inject, Provide
 from datetime import datetime
 
+from webapp.common.src.taxi_container import TaxiContainer
+from webapp.common.util.token_decoder import get_user_id
 from webapp.domain.taxi_group.application.taxi_group_service import TaxiGroupService
 from webapp.domain.taxi_group.application.query_service import QueryService
 from webapp.domain.taxi_group.application.owner_permission import owner_permission
-from webapp.common.src.taxi_container import TaxiContainer
-from webapp.common.util.token_decoder import get_user_id
 
 from .models.taxi import (
     TaxiGroupCreate,
@@ -35,8 +35,8 @@ async def create_taxi_group(
 
     group_id = taxi_group_service.create(
         owner_id=user_id,
-        max_members=req.max_member,
-        departure_datetime=req.depart_datetime,
+        max_members=req.max_members,
+        departure_datetime=req.departure_datetime,
         direction=req.direction
     )
 
@@ -52,7 +52,7 @@ async def get_taxi_groups(
         option: GroupQueryOption = Query(GroupQueryOption.COMPLETED, description='조회 옵션'),
         direction: Direction = Query(Direction.ALL, description='조회할 방향'),
         departure_datetime: datetime = Query(datetime.now(), description='조회할 방향'),
-        user_id: int = Depends(get_user_id),
+        user_id: str = Depends(get_user_id),
         query_service: QueryService = Depends(Provide[TaxiContainer.query_service])
 ) -> list[TaxiGroup]:
 
@@ -66,8 +66,8 @@ async def get_taxi_groups(
 )
 @inject
 async def get_taxi_group_detail(
-        group_id: int,
-        user_id: int = Depends(get_user_id),
+        group_id: str,
+        user_id: str = Depends(get_user_id),
         query_service: QueryService = Depends(Provide[TaxiContainer.query_service])
 ) -> TaxiGroup:
 
@@ -81,7 +81,7 @@ async def get_taxi_group_detail(
 )
 @inject
 async def get_fare(
-        group_id: int,
+        group_id: str,
         query_service: QueryService = Depends(Provide[TaxiContainer.query_service])
 ) -> FareDetail:
 
@@ -96,15 +96,16 @@ async def get_fare(
 )
 @inject
 async def update_fare(
-        group_id: int,
+        group_id: str,
         req: FareUpdate,
         taxi_group_service: TaxiGroupService = Depends(Provide[TaxiContainer.taxi_group_service])
 ) -> None:
 
+    members = [(member.id, member.cost) for member in req.members]
     taxi_group_service.update_fare(
         group_id=group_id,
         fare=req.fare,
-        members=req.members
+        members=members
     )
 
 
@@ -114,8 +115,8 @@ async def update_fare(
     dependencies=[Depends(owner_permission)],
 )
 @inject
-async def recruit(
-        group_id: int,
+async def open(
+        group_id: str,
         taxi_group_service: TaxiGroupService = Depends(Provide[TaxiContainer.taxi_group_service])
 ) -> None:
 
@@ -129,7 +130,7 @@ async def recruit(
 )
 @inject
 async def close(
-        group_id: int,
+        group_id: str,
         taxi_group_service: TaxiGroupService = Depends(Provide[TaxiContainer.taxi_group_service])
 ) -> None:
 
@@ -143,7 +144,7 @@ async def close(
 )
 @inject
 async def settle(
-        group_id: int,
+        group_id: str,
         taxi_group_service: TaxiGroupService = Depends(Provide[TaxiContainer.taxi_group_service])
 ) -> None:
 
@@ -157,7 +158,7 @@ async def settle(
 )
 @inject
 async def complete(
-        group_id: int,
+        group_id: str,
         taxi_group_service: TaxiGroupService = Depends(Provide[TaxiContainer.taxi_group_service])
 ) -> None:
 
@@ -170,8 +171,8 @@ async def complete(
 )
 @inject
 async def participate(
-        group_id: int,
-        user_id: int = Depends(get_user_id),
+        group_id: str,
+        user_id: str = Depends(get_user_id),
         taxi_group_service: TaxiGroupService = Depends(Provide[TaxiContainer.taxi_group_service])
 ) -> None:
 
@@ -184,8 +185,8 @@ async def participate(
 )
 @inject
 async def leave(
-        group_id: int,
-        user_id: int = Depends(get_user_id),
+        group_id: str,
+        user_id: str = Depends(get_user_id),
         taxi_group_service: TaxiGroupService = Depends(Provide[TaxiContainer.taxi_group_service])
 ) -> None:
 

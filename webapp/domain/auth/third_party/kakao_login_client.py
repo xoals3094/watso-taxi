@@ -1,5 +1,5 @@
-from webapp.domain.auth.dto.kakao_user_info import KakaoUserInfo
 import requests
+from webapp.domain.auth.dto.kakao_user_info import KakaoUserInfo
 
 
 def get_user_info(access_token) -> KakaoUserInfo:

@@ -8,6 +8,7 @@ class UserService:
 
     def get_user(self, user_id) -> User:
         user = self.user_repository.find_by_id(user_id)
+
         return User(
             id=user.id,
             nickname=user.nickname,

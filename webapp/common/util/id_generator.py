@@ -1,5 +1,5 @@
-from datetime import datetime
+import uuid
 
 
-def create_id():
-    return int(datetime.now().timestamp() * 1000)
+def create_id() -> str:
+    return uuid.uuid4().hex

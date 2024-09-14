@@ -7,7 +7,7 @@ from webapp.domain.auth.entity.kakao import Kakao
 class KakaoRepository(MySqlDatabase):
     def find_by_id(self, kakao_id) -> Kakao:
         try:
-            kakao = self.session.query(Kakao).filter(Kakao.id == kakao_id).one()
+            kakao = self.session.query(Kakao).filter(Kakao.kakao_id == kakao_id).one()
         except sqlalchemy.exc.NoResultFound:
             raise persistence.ResourceNotFound
 

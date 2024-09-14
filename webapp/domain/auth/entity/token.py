@@ -10,6 +10,8 @@ class Token(TokenModel):
         if exp - datetime.now() < timedelta(days=30):
             self.refresh_token = create_refresh_token(self.id)
 
+        self.updated_at = datetime.now()
+
     @staticmethod
     def create(user_id: str):
         token_id = create_id()

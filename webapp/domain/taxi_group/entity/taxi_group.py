@@ -55,7 +55,7 @@ class TaxiGroup(Group):
         self._set_status(Status.CLOSE)
 
     def settle(self):
-        self._set_status(Status.CLOSE)
+        self._set_status(Status.SETTLE)
 
     def complete(self):
         self._set_status(Status.COMPLETE)

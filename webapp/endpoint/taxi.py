@@ -49,14 +49,28 @@ async def create_taxi_group(
 )
 @inject
 async def get_taxi_groups(
-        option: GroupQueryOption = Query(GroupQueryOption.COMPLETED, description='조회 옵션'),
-        direction: Direction = Query(Direction.ALL, description='조회할 방향'),
+        option: GroupQueryOption = Query(..., description='조회 옵션'),
+        direction: Direction = Query(Direction.CAMPUS, description='조회할 방향'),
         departure_datetime: datetime = Query(datetime.now(), description='조회할 방향'),
         user_id: str = Depends(get_user_id),
         query_service: QueryService = Depends(Provide[TaxiContainer.query_service])
 ) -> list[TaxiGroup]:
 
     groups = query_service.get_taxi_group_list(option, direction, user_id, departure_datetime)
+    return groups
+
+
+@taxi_router.get(
+    '/history',
+    response_model=list[TaxiGroup]
+)
+@inject
+async def get_taxi_group_history(
+        user_id: str = Depends(get_user_id),
+        query_service: QueryService = Depends(Provide[TaxiContainer.query_service])
+) -> list[TaxiGroup]:
+
+    groups = query_service.get_history(user_id)
     return groups
 
 

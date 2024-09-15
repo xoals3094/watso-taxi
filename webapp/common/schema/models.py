@@ -51,3 +51,5 @@ class MemberModel(Base):
     id = Column(String(32), primary_key=True)
     group_id = Column(String(32), ForeignKey('groups.id'))
     user_id = Column(String(32), ForeignKey('users.id'))
+
+    user = relationship('UserModel', uselist=False)

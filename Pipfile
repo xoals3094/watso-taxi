@@ -9,13 +9,14 @@ uvicorn = {extras = ["standard"], version = "*"}
 redis = "*"
 gunicorn = "*"
 firebase-admin = "*"
-dependency-injector = "*"
 cryptography = "*"
 pyjwt = "*"
 bcrypt = "*"
 python-multipart = "*"
 multipledispatch = "*"
-pymysql = "*"
+sqlalchemy="*"
+pymysql="*"
+alembic="*"
 bson = "*"
 
 [dev-packages]

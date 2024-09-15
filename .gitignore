@@ -4,3 +4,4 @@ config/
 *.pyc
 __pycache__/
 log/
+migrations/versions/*

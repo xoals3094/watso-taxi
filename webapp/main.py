@@ -7,6 +7,10 @@ from webapp.common.src.auth_container import AuthContainer
 from webapp.common.src.user_container import UserContainer
 from webapp.common.src.taxi_container import TaxiContainer
 
+from endpoint.exception_handing.auth_exception_handler import auth_exception_handler
+from endpoint.exception_handing.query_exception_handler import query_exception_handler
+from endpoint.exception_handing.domain_exception_handler import domain_exception_handler
+
 
 def create_app():
     auth_container = AuthContainer()
@@ -14,6 +18,10 @@ def create_app():
     taxi_container = TaxiContainer()
 
     app = FastAPI()
+    auth_exception_handler(app)
+    query_exception_handler(app)
+    domain_exception_handler(app)
+
     app.auth_container = auth_container
     app.taxi_container = taxi_container
     app.user_container = user_container

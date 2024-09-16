@@ -12,10 +12,10 @@ class AccessDenied(AuthenticationException):
 
 
 class LoginFail(AuthenticationException):
-    def __init__(self, msg):
+    def __init__(self, msg='로그인 실패'):
         super().__init__(msg=msg)
 
 
 class TokenExpired(AuthenticationException):
-    def __init__(self, msg):
+    def __init__(self, msg='토큰 만료'):
         super().__init__(msg=msg)

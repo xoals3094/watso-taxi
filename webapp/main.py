@@ -7,9 +7,9 @@ from webapp.common.src.auth_container import AuthContainer
 from webapp.common.src.user_container import UserContainer
 from webapp.common.src.taxi_container import TaxiContainer
 
-from endpoint.exception_handing.auth_exception_handler import auth_exception_handler
-from endpoint.exception_handing.query_exception_handler import query_exception_handler
-from endpoint.exception_handing.domain_exception_handler import domain_exception_handler
+from webapp.endpoint.exception_handing.auth_exception_handler import auth_exception_handler
+from webapp.endpoint.exception_handing.query_exception_handler import query_exception_handler
+from webapp.endpoint.exception_handing.domain_exception_handler import domain_exception_handler
 
 
 def create_app():

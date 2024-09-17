@@ -1,12 +1,50 @@
+from sqlalchemy import (
+    Column,
+    Integer,
+    String,
+    Boolean,
+    DateTime,
+    ForeignKey
+)
+from sqlalchemy.orm import relationship
+from webapp.common.schema.models import Base
 from webapp.common.exceptions import domain
-from webapp.common.schema.models import GroupModel, MemberModel
 
 
-class Member(MemberModel):
-    pass
+class Member(Base):
+    __tablename__ = 'members'
+
+    id = Column(String(32), primary_key=True)
+    type = Column(String(20))
+    group_id = Column(String(32), ForeignKey('groups.id'))
+    user_id = Column(String(32), ForeignKey('users.id'))
+
+    group = relationship('Group', back_populates='members', uselist=False)
+    user = relationship('UserModel', uselist=False)
+
+    __mapper_args__ = {
+        'polymorphic_identity': 'member',
+        'polymorphic_on': 'type'
+    }
 
 
-class Group(GroupModel):
+class Group(Base):
+    __tablename__ = 'groups'
+
+    id = Column(String(32), primary_key=True)
+    type = Column(String(20))
+    created_at = Column(DateTime, nullable=False)
+    owner_id = Column(String(32), nullable=False)
+    is_open = Column(Boolean, nullable=False)
+    max_members = Column(Integer, nullable=False)
+
+    members = relationship('Member', back_populates='group', cascade='delete, delete-orphan')
+
+    __mapper_args__ = {
+        'polymorphic_identity': 'group',
+        'polymorphic_on': 'type'
+    }
+
     def open(self):
         self.is_open = True
 

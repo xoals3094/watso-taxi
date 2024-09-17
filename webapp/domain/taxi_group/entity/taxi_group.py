@@ -18,6 +18,12 @@ class TaxiGroupMember(Member):
     id = Column(String(32), ForeignKey('members.id'), primary_key=True)
     cost = Column(Integer, nullable=False)
 
+    group = relationship('Group', back_populates='members')
+
+    __mapper_args__ = {
+        'polymorphic_identity': 'taxi',
+    }
+
 
 class TaxiGroup(Group):
     __tablename__ = 'taxi_groups'
@@ -28,7 +34,9 @@ class TaxiGroup(Group):
     departure_datetime = Column(DateTime, nullable=False)
     direction = Column(String(20), nullable=False)
 
-    members = relationship('TaxiGroupMember')
+    __mapper_args__ = {
+        'polymorphic_identity': 'taxi',
+    }
 
     def _set_status(self, status):
         Status(self.status).to(status)

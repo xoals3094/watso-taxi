@@ -24,6 +24,9 @@ class TaxiGroupService:
         self.taxi_group_repository.save(taxi_group)
         return taxi_group.id
 
+    def delete(self, group_id):
+        self.taxi_group_repository.delete(group_id)
+
     def open(self, group_id: str):
         taxi_group = self.taxi_group_repository.find_by_id(group_id)
         taxi_group.open()

@@ -45,7 +45,6 @@ class TaxiGroup(BaseModel):
         max_members: int = Field(..., description='최대 인원', examples=[4])
 
     id: str = Field(..., description='그룹 ID', examples=[create_id()])
-    role: str = Field(..., description='권한', examples=['OWNER', 'NORMAL'])
     status: str = Field(..., description='상태 코드', examples=['OPEN', 'CLOSE', 'SETTLE', 'COMPLETE'])
     direction: Direction
     departure_datetime: datetime = Field(..., description='출발 시간', examples=[datetime.now().strftime('%Y-%m-%dT%H:%M:%S')])

@@ -1,38 +1,16 @@
 from webapp.common.exceptions import auth, persistence
 from webapp.common.util.token_decoder import get_token_id_and_exp
 from webapp.domain.auth.entity.token import Token
-from webapp.domain.auth.entity.kakao import Kakao
-from webapp.domain.auth.persistance.kakao_repository import KakaoRepository
 from webapp.domain.auth.persistance.token_repository import TokenRepository
-from webapp.domain.auth.third_party import kakao_login_client
 
 
-class AuthService:
-    def __init__(
-            self,
-            kakao_repository: KakaoRepository,
-            token_repository: TokenRepository
-    ):
-        self.kakao_repository = kakao_repository
+class JWTAuthService:
+    def __init__(self, token_repository: TokenRepository):
         self.token_repository = token_repository
 
-    def login(self, access_token) -> (str, str):
-        kakao_user_info = kakao_login_client.get_user_info(access_token)
-        try:
-            kakao = self.kakao_repository.find_by_id(kakao_id=kakao_user_info.id)
-            user_id = kakao.id
-        except persistence.ResourceNotFound:
-            kakao = Kakao.create(
-                kakao_id=kakao_user_info.id,
-                nickname=kakao_user_info.nickname,
-                profile_image_url=kakao_user_info.profile_image_url
-            )
-            user_id = kakao.id
-            self.kakao_repository.save(kakao)
-
+    def login(self, user_id: str) -> (str, str):
         token = Token.create(user_id)
         self.token_repository.save(token)
-
         return (
             token.access_token,
             token.refresh_token

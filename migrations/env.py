@@ -4,7 +4,11 @@ from sqlalchemy import engine_from_config
 from sqlalchemy import pool
 
 from alembic import context
-from webapp.common.schema import models
+from webapp.domain.group import group
+from webapp.domain.taxi_group.entity import taxi_group
+from webapp.domain.user.entity.user import User
+from webapp.domain.auth.entity.kakao import Kakao
+from webapp.domain.auth.entity.token import Token
 from config import mysql
 # this is the Alembic Config object, which provides
 # access to the values within the .ini file in use.

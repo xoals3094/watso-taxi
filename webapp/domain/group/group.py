@@ -20,7 +20,7 @@ class Member(Base):
     user_id = Column(String(32), ForeignKey('users.id'))
 
     group = relationship('Group', back_populates='members', uselist=False)
-    user = relationship('UserModel', uselist=False)
+    user = relationship('User', uselist=False)
 
     __mapper_args__ = {
         'polymorphic_identity': 'member',

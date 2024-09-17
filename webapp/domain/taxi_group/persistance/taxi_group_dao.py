@@ -1,7 +1,6 @@
 from sqlalchemy.orm import joinedload
 from sqlalchemy import select
 from datetime import datetime, timedelta
-from webapp.common.schema.models import UserModel
 from webapp.domain.taxi_group.persistance.taxi_group_repository import TaxiGroupRepository
 from webapp.domain.taxi_group.entity.taxi_group import Group, TaxiGroup
 from webapp.domain.taxi_group.entity.taxi_group import Member, TaxiGroupMember
@@ -84,7 +83,7 @@ class TaxiGroupDao(TaxiGroupRepository):
 
         stmt = select(
             TaxiGroupMember.user_id,
-            UserModel.nickname,
+            TaxiGroupMember.user.nickname,
             TaxiGroupMember.cost
         ).join(
             TaxiGroupMember.user

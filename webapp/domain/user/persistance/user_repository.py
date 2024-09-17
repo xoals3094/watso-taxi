@@ -14,3 +14,7 @@ class UserRepository(MySqlDatabase):
             raise persistence.ResourceNotFound
 
         return user
+
+    def save(self, user: User):
+        self.session.add(user)
+        self.session.commit()

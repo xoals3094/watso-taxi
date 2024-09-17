@@ -1,5 +1,5 @@
 import sqlalchemy.exc
-from sqlalchemy import delete
+from sqlalchemy import delete, select
 from webapp.common.database import MySqlDatabase
 from webapp.common.exceptions import persistence
 from webapp.domain.auth.entity.token import Token
@@ -7,10 +7,9 @@ from webapp.domain.auth.entity.token import Token
 
 class TokenRepository(MySqlDatabase):
     def find_by_id(self, token_id) -> Token:
+        stmt = select(Token).filter_by(id=token_id)
         try:
-            token = self.session.query(Token).filter(
-                Token.id == token_id
-            ).one()
+            token = self.session.execute(stmt).scalar_one()
         except sqlalchemy.exc.NoResultFound:
             raise persistence.ResourceNotFound
 
@@ -21,7 +20,6 @@ class TokenRepository(MySqlDatabase):
         self.session.commit()
 
     def delete(self, token_id: str):
-        self.session.execute(
-            delete(Token).where(Token.id == token_id)
-        )
+        stmt = delete(Token).filter_by(id=token_id)
+        self.session.execute(stmt)
         self.session.commit()

@@ -11,14 +11,10 @@ class TaxiGroupDao(TaxiGroupRepository):
     def __init__(self, session):
         super(TaxiGroupDao, self).__init__(session)
 
-    def find_complete(self, user_id) -> list[TaxiGroup]:
-        my_groups_subquery = self.session.query(
-            Member.group_id
-        ).filter(
-            Member.user_id == user_id
-        ).subquery()
+    def find_complete(self, user_id: str) -> list[TaxiGroup]:
+        my_groups_subquery = select(Member.group_id).filter_by(user_id=user_id).subquery()
 
-        taxi_groups = self.session.query(
+        stmt = select(
             TaxiGroup
         ).options(
             joinedload(TaxiGroup.members)
@@ -30,16 +26,14 @@ class TaxiGroupDao(TaxiGroupRepository):
             Group.id.in_(my_groups_subquery.select())
         ).order_by(TaxiGroup.departure_datetime).all()
 
+        taxi_groups = self.session.execute(stmt).scalars().unique().all()
+
         return taxi_groups
 
-    def find_joined(self, user_id, departure_datetime) -> list[TaxiGroup]:
-        my_groups_subquery = self.session.query(
-            TaxiGroupMember.group_id
-        ).filter(
-            TaxiGroupMember.user_id == user_id
-        ).subquery()
+    def find_joined(self, user_id: str, departure_datetime: datetime) -> list[TaxiGroup]:
+        my_groups_subquery = select(Member.group_id).filter_by(user_id=user_id).subquery()
 
-        taxi_groups = self.session.query(
+        stmt = select(
             TaxiGroup
         ).options(
             joinedload(TaxiGroup.members)
@@ -49,18 +43,16 @@ class TaxiGroupDao(TaxiGroupRepository):
             TaxiGroup.departure_datetime >= departure_datetime
         ).filter(
             Group.id.in_(my_groups_subquery.select())
-        ).order_by(TaxiGroup.departure_datetime).all()
+        ).order_by(TaxiGroup.departure_datetime)
+
+        taxi_groups = self.session.execute(stmt).scalars().unique().all()
 
         return taxi_groups
 
     def find_joinable(self, user_id, direction, departure_datetime) -> list[TaxiGroup]:
-        my_groups_subquery = self.session.query(
-            TaxiGroupMember.group_id
-        ).filter(
-            TaxiGroupMember.user_id == user_id
-        ).subquery()
+        my_groups_subquery = select(Member.group_id).filter_by(user_id=user_id).subquery()
 
-        taxi_groups = self.session.query(
+        stmt = select(
             TaxiGroup
         ).options(
             joinedload(TaxiGroup.members)
@@ -72,7 +64,9 @@ class TaxiGroupDao(TaxiGroupRepository):
             TaxiGroup.departure_datetime >= departure_datetime
         ).filter(
             Group.id.not_in(my_groups_subquery.select())
-        ).order_by(TaxiGroup.departure_datetime).all()
+        ).order_by(TaxiGroup.departure_datetime)
+
+        taxi_groups = self.session.execute(stmt).scalars().unique().all()
 
         return taxi_groups
 

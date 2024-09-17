@@ -89,6 +89,20 @@ async def get_taxi_group_detail(
     return group
 
 
+@taxi_router.delete(
+    '/{group_id}',
+    status_code=status.HTTP_204_NO_CONTENT,
+    dependencies=[Depends(owner_permission)]
+)
+@inject
+async def delete_taxi_group(
+        group_id: str,
+        taxi_group_service: TaxiGroupService = Depends(Provide[TaxiContainer.taxi_group_service])
+) -> None:
+
+    taxi_group_service.delete(group_id=group_id)
+
+
 @taxi_router.get(
     '/{group_id}/fare',
     response_model=FareDetail

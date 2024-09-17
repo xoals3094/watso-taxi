@@ -45,7 +45,7 @@ class TaxiGroup(BaseModel):
         max_members: int = Field(..., description='최대 인원', examples=[4])
 
     id: str = Field(..., description='그룹 ID', examples=[create_id()])
-    role: str = Field(..., description='권한', examples=['OWNER', 'NORMAL'])
+    role: str = Field(..., description='권한', examples=['OWNER', 'MEMBER', 'NON_MEMBER'])
     status: str = Field(..., description='상태 코드', examples=['OPEN', 'CLOSE', 'SETTLE', 'COMPLETE'])
     direction: Direction
     departure_datetime: datetime = Field(..., description='출발 시간', examples=[datetime.now().strftime('%Y-%m-%dT%H:%M:%S')])
@@ -54,8 +54,11 @@ class TaxiGroup(BaseModel):
 
     @staticmethod
     def mapping(user_id, taxi_group: TaxiGroupDomain):
-        role = "OWNER" if taxi_group.owner_id == user_id else 'MEMBER'
         member = next((member for member in taxi_group.members if member.user_id == user_id), None)
+        role = 'NON_MEMBER'
+        if member:
+            role = "OWNER" if taxi_group.owner_id == user_id else 'MEMBER'
+
         cost = taxi_group.fare // (len(taxi_group.members) + 1)
         if member:
             cost = member.cost

@@ -1,4 +1,5 @@
 from abc import *
+from sqlalchemy import delete
 from webapp.common.database import MySqlDatabase
 from webapp.domain.group.group import Group
 
@@ -13,6 +14,6 @@ class GroupRepository(MySqlDatabase, metaclass=ABCMeta):
         pass
 
     def delete(self, group_id):
-        group = self.session.query(Group).filter(Group.id == group_id).one()
-        self.session.delete(group)
+        stmt = delete(Group).filter_by(id=group_id)
+        self.session.execute(stmt)
         self.session.commit()

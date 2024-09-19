@@ -2,7 +2,7 @@ from fastapi import APIRouter, Depends, Query, status
 from dependency_injector.wiring import inject, Provide
 from datetime import datetime
 
-from webapp.common.src.taxi_container import TaxiContainer
+from webapp.common.src.container import Container
 from webapp.common.util.token_decoder import get_user_id
 from webapp.domain.taxi_group.application.taxi_group_service import TaxiGroupService
 from webapp.domain.taxi_group.application.query_service import QueryService
@@ -30,7 +30,7 @@ taxi_router = APIRouter()
 async def create_taxi_group(
         req: TaxiGroupCreate,
         user_id=Depends(get_user_id),
-        taxi_group_service: TaxiGroupService = Depends(Provide[TaxiContainer.taxi_group_service])
+        taxi_group_service: TaxiGroupService = Depends(Provide[Container.taxi_group_service])
 ) -> GroupId:
 
     group_id = taxi_group_service.create(
@@ -53,7 +53,7 @@ async def get_taxi_groups(
         direction: Direction = Query(Direction.CAMPUS, description='조회할 방향'),
         departure_datetime: datetime = Query(datetime.now(), description='조회할 방향'),
         user_id: str = Depends(get_user_id),
-        query_service: QueryService = Depends(Provide[TaxiContainer.query_service])
+        query_service: QueryService = Depends(Provide[Container.query_service])
 ) -> list[TaxiGroup]:
 
     groups = query_service.get_taxi_group_list(option, direction, user_id, departure_datetime)
@@ -67,7 +67,7 @@ async def get_taxi_groups(
 @inject
 async def get_taxi_group_history(
         user_id: str = Depends(get_user_id),
-        query_service: QueryService = Depends(Provide[TaxiContainer.query_service])
+        query_service: QueryService = Depends(Provide[Container.query_service])
 ) -> list[TaxiGroup]:
 
     groups = query_service.get_history(user_id)
@@ -82,7 +82,7 @@ async def get_taxi_group_history(
 async def get_taxi_group_detail(
         group_id: str,
         user_id: str = Depends(get_user_id),
-        query_service: QueryService = Depends(Provide[TaxiContainer.query_service])
+        query_service: QueryService = Depends(Provide[Container.query_service])
 ) -> TaxiGroup:
 
     group = query_service.get_taxi_group(group_id=group_id, user_id=user_id)
@@ -97,7 +97,7 @@ async def get_taxi_group_detail(
 @inject
 async def delete_taxi_group(
         group_id: str,
-        taxi_group_service: TaxiGroupService = Depends(Provide[TaxiContainer.taxi_group_service])
+        taxi_group_service: TaxiGroupService = Depends(Provide[Container.taxi_group_service])
 ) -> None:
 
     taxi_group_service.delete(group_id=group_id)
@@ -110,7 +110,7 @@ async def delete_taxi_group(
 @inject
 async def get_fare(
         group_id: str,
-        query_service: QueryService = Depends(Provide[TaxiContainer.query_service])
+        query_service: QueryService = Depends(Provide[Container.query_service])
 ) -> FareDetail:
 
     fare = query_service.get_fare(group_id=group_id)
@@ -126,7 +126,7 @@ async def get_fare(
 async def update_fare(
         group_id: str,
         req: FareUpdate,
-        taxi_group_service: TaxiGroupService = Depends(Provide[TaxiContainer.taxi_group_service])
+        taxi_group_service: TaxiGroupService = Depends(Provide[Container.taxi_group_service])
 ) -> None:
 
     members = [(member.id, member.cost) for member in req.members]
@@ -145,7 +145,7 @@ async def update_fare(
 @inject
 async def open(
         group_id: str,
-        taxi_group_service: TaxiGroupService = Depends(Provide[TaxiContainer.taxi_group_service])
+        taxi_group_service: TaxiGroupService = Depends(Provide[Container.taxi_group_service])
 ) -> None:
 
     taxi_group_service.open(group_id=group_id)
@@ -159,7 +159,7 @@ async def open(
 @inject
 async def close(
         group_id: str,
-        taxi_group_service: TaxiGroupService = Depends(Provide[TaxiContainer.taxi_group_service])
+        taxi_group_service: TaxiGroupService = Depends(Provide[Container.taxi_group_service])
 ) -> None:
 
     taxi_group_service.close(group_id=group_id)
@@ -173,7 +173,7 @@ async def close(
 @inject
 async def settle(
         group_id: str,
-        taxi_group_service: TaxiGroupService = Depends(Provide[TaxiContainer.taxi_group_service])
+        taxi_group_service: TaxiGroupService = Depends(Provide[Container.taxi_group_service])
 ) -> None:
 
     taxi_group_service.settle(group_id=group_id)
@@ -187,7 +187,7 @@ async def settle(
 @inject
 async def complete(
         group_id: str,
-        taxi_group_service: TaxiGroupService = Depends(Provide[TaxiContainer.taxi_group_service])
+        taxi_group_service: TaxiGroupService = Depends(Provide[Container.taxi_group_service])
 ) -> None:
 
     taxi_group_service.complete(group_id=group_id)
@@ -201,7 +201,7 @@ async def complete(
 async def participate(
         group_id: str,
         user_id: str = Depends(get_user_id),
-        taxi_group_service: TaxiGroupService = Depends(Provide[TaxiContainer.taxi_group_service])
+        taxi_group_service: TaxiGroupService = Depends(Provide[Container.taxi_group_service])
 ) -> None:
 
     taxi_group_service.participate(group_id=group_id, user_id=user_id)
@@ -215,7 +215,7 @@ async def participate(
 async def leave(
         group_id: str,
         user_id: str = Depends(get_user_id),
-        taxi_group_service: TaxiGroupService = Depends(Provide[TaxiContainer.taxi_group_service])
+        taxi_group_service: TaxiGroupService = Depends(Provide[Container.taxi_group_service])
 ) -> None:
 
     taxi_group_service.leave(group_id=group_id, user_id=user_id)

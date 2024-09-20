@@ -28,7 +28,7 @@ async def logout(
     '/login/refresh',
     response_model=TokenPair,
 )
-def refresh(
+async def refresh(
         req: RefreshToken,
         auth_service: JWTAuthService = Depends(container.get_jwt_auth_service)
 ) -> TokenPair:

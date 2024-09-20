@@ -1,11 +1,16 @@
-from fastapi import APIRouter, Depends, Query, status
+import starlette.websockets
+from fastapi import APIRouter, Depends, Query, status, WebSocket
 from datetime import datetime
 
+
+from webapp.common.exceptions import auth
 from webapp.common.src import container
 from webapp.common.util.token_decoder import get_user_id
 from webapp.domain.taxi_group.application.taxi_group_service import TaxiGroupService
 from webapp.domain.taxi_group.application.query_service import QueryService
 from webapp.domain.taxi_group.application.owner_permission import owner_permission
+from webapp.domain.chat.chat_service import ChatService
+
 
 from .models.taxi import (
     TaxiGroupCreate,
@@ -207,50 +212,25 @@ async def leave(
     taxi_group_service.leave(group_id=group_id, user_id=user_id)
 
 
-
-import starlette.websockets
-from fastapi import WebSocket
-
-
-class ConnectionManager:
-    def __init__(self):
-        self.groups: dict[list[WebSocket]] = {}
-
-    async def connect(self, group_id, websocket: WebSocket):
-        await websocket.accept()
-        try:
-            self.groups[group_id].append(websocket)
-        except KeyError:
-            self.groups[group_id] = [websocket]
-
-    def disconnect(self, group_id, websocket: WebSocket):
-        self.groups[group_id].remove(websocket)
-        if len(self.groups[group_id]) == 0:
-            self.groups.pop(group_id)
-
-    async def broadcast(self, group_id, message):
-        for connection in self.groups[group_id]:
-            await connection.send_json(message)
-
-
-manager = ConnectionManager()
-
-
 @taxi_router.websocket("/{group_id}")
 async def websocket_endpoint(
         group_id: str,
         token: str,
         websocket: WebSocket,
+        chat_service: ChatService = Depends(container.get_chat_service)
 ):
-    user_id = get_user_id(token)
-    await manager.connect(group_id, websocket)
+    try:
+        user_id = get_user_id(token)
+    except auth.TokenExpired:
+        await websocket.close(1008, 'Unauthorized')
+        return
+    await websocket.accept()
+
+    await chat_service.participate(group_id, user_id, websocket)
     try:
         while True:
-            print(f'hello, {user_id}')
             data = await websocket.receive_json()
-            data = {
-                'message': data['message']
-            }
-            await manager.broadcast(group_id, data)
+            content = data['content']
+            await chat_service.send_message(group_id, user_id, content)
     except starlette.websockets.WebSocketDisconnect:
-        manager.disconnect(group_id, websocket)
+        await chat_service.leave(group_id, user_id)

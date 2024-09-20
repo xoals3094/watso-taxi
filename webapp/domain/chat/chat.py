@@ -21,6 +21,16 @@ class Chat:
 
 
 @dataclass
+class MetaData(Chat):
+    users: list[dict] = None
+    type: str = "METADATA"
+
+    @classmethod
+    def create(cls, users: list[dict]):
+        return Chat._create(cls, cls.type, users=users)
+
+
+@dataclass
 class Message(Chat):
     user_id: str = None
     content: str = None
@@ -28,7 +38,7 @@ class Message(Chat):
 
     @classmethod
     def create(cls, user_id, content):
-        return Chat._create(Message, cls.type, user_id=user_id, content=content)
+        return Chat._create(cls, cls.type, user_id=user_id, content=content)
 
 
 @dataclass
@@ -66,3 +76,7 @@ class Channel:
     async def send(self, chat: Chat):
         for user_id, websocket in self.websockets.items():
             await websocket.send_json(str(chat.__dict__))
+
+    @property
+    def member_ids(self) -> list[str]:
+        return [key for key in self.websockets.keys()]

@@ -1,3 +1,5 @@
+import contextlib
+
 from fastapi import Depends
 from sqlalchemy.orm import sessionmaker
 from webapp.common.database import engine
@@ -10,10 +12,15 @@ from webapp.domain.auth.application.kakao_auth_service import KakaoAuthService
 from webapp.domain.user.persistance.user_repository import UserRepository
 from webapp.domain.user.application.user_service import UserService
 
+from webapp.domain.chat.chat_service import ChatService
+from webapp.domain.chat.channel_manager import ChannelManager
 from webapp.domain.taxi_group.application.taxi_group_service import TaxiGroupService
 from webapp.domain.taxi_group.persistance.taxi_group_repository import TaxiGroupRepository
 from webapp.domain.taxi_group.application.query_service import QueryService
 from webapp.domain.taxi_group.persistance.taxi_group_dao import TaxiGroupDao
+
+
+channel_manager = ChannelManager()
 
 
 def get_session():
@@ -27,6 +34,27 @@ def get_session():
         if session.dirty or session.new or session.deleted:
             session.commit()
         session.close()
+
+
+@contextlib.contextmanager
+def get_session_context():
+    session = get_session()
+    try:
+        yield next(session)
+    except Exception as e:
+        raise e
+    finally:
+        try:
+            next(session)
+        except StopIteration:
+            pass
+
+
+def get_chat_service():
+    return ChatService(
+        channel_manager=channel_manager,
+        session_context=get_session_context
+    )
 
 
 def get_kakao_repository(session=Depends(get_session)):

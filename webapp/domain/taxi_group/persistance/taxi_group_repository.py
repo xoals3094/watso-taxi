@@ -19,4 +19,3 @@ class TaxiGroupRepository(GroupRepository):
         for member in taxi_group.members:
             self.session.add(member)
         self.session.add(taxi_group)
-        self.session.commit()

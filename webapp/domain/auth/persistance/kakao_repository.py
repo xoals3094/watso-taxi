@@ -18,4 +18,3 @@ class KakaoRepository(MySqlDatabase):
 
     def save(self, kakao: Kakao):
         self.session.add(kakao)
-        self.session.commit()

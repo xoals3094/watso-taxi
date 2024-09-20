@@ -17,9 +17,7 @@ class TokenRepository(MySqlDatabase):
 
     def save(self, token: Token):
         self.session.add(token)
-        self.session.commit()
 
     def delete(self, token_id: str):
         stmt = delete(Token).filter_by(id=token_id)
         self.session.execute(stmt)
-        self.session.commit()

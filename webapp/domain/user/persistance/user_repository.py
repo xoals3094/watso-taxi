@@ -17,4 +17,3 @@ class UserRepository(MySqlDatabase):
 
     def save(self, user: User):
         self.session.add(user)
-        self.session.commit()

@@ -1,8 +1,7 @@
 from fastapi import APIRouter, Depends, status
-from dependency_injector.wiring import inject, Provide
 from webapp.domain.auth.application.jwt_auth_service import JWTAuthService
 from webapp.domain.auth.application.kakao_auth_service import KakaoAuthService
-from webapp.common.src.container import Container
+from webapp.common.src import container
 
 from .models.auth import (
     TokenPair,
@@ -17,10 +16,9 @@ auth_router = APIRouter()
     '/logout',
     status_code=status.HTTP_204_NO_CONTENT
 )
-@inject
 async def logout(
         req: RefreshToken,
-        auth_service: JWTAuthService = Depends(Provide[Container.jwt_auth_service])
+        auth_service: JWTAuthService = Depends(container.get_jwt_auth_service)
 ) -> None:
 
     auth_service.logout(req.refresh_token)
@@ -30,10 +28,9 @@ async def logout(
     '/login/refresh',
     response_model=TokenPair,
 )
-@inject
-async def refresh(
+def refresh(
         req: RefreshToken,
-        auth_service: JWTAuthService = Depends(Provide[Container.jwt_auth_service])
+        auth_service: JWTAuthService = Depends(container.get_jwt_auth_service)
 ) -> TokenPair:
 
     access_token, refresh_token = auth_service.refresh(req.refresh_token)
@@ -47,10 +44,9 @@ async def refresh(
     '/login/kakao',
     response_model=TokenPair
 )
-@inject
 async def kakao_login(
         code: str,
-        auth_service: KakaoAuthService = Depends(Provide[Container.kakao_auth_service])
+        auth_service: KakaoAuthService = Depends(container.get_kakao_auth_service)
 ) -> TokenPair:
 
     access_token, refresh_token = auth_service.login(code)

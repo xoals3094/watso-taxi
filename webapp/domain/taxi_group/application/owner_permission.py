@@ -1,6 +1,6 @@
 from fastapi import Depends
 from sqlalchemy import select
-from webapp.common.database import get_session
+from webapp.common.src.container import get_session
 from webapp.common.util.token_decoder import get_user_id
 from webapp.domain.taxi_group.entity.taxi_group import TaxiGroup
 

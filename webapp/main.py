@@ -3,7 +3,6 @@ from fastapi import FastAPI
 from webapp.endpoint.auth import auth_router
 from webapp.endpoint.taxi import taxi_router
 from webapp.endpoint.user import user_router
-from webapp.common.src.container import Container
 
 from webapp.endpoint.exception_handing.auth_exception_handler import auth_exception_handler
 from webapp.endpoint.exception_handing.domain_exception_handler import domain_exception_handler
@@ -12,7 +11,6 @@ from webapp.endpoint.exception_handing.persistance_exception_handler import pers
 
 def create_app():
     app = FastAPI()
-    app.auth_container = Container()
 
     auth_exception_handler(app)
     domain_exception_handler(app)

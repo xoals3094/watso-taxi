@@ -18,6 +18,7 @@ sqlalchemy="*"
 pymysql="*"
 alembic="*"
 bson = "*"
+pytest = "*"
 
 [dev-packages]
 

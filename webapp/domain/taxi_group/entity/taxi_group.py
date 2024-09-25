@@ -18,8 +18,6 @@ class TaxiGroupMember(Member):
     id = Column(String(32), ForeignKey('members.id'), primary_key=True)
     cost = Column(Integer, nullable=False)
 
-    group = relationship('Group', back_populates='members')
-
     __mapper_args__ = {
         'polymorphic_identity': 'taxi',
     }

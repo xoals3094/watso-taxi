@@ -19,9 +19,6 @@ class Member(Base):
     group_id = Column(String(32), ForeignKey('groups.id'))
     user_id = Column(String(32), ForeignKey('users.id'))
 
-    group = relationship('Group', back_populates='members', uselist=False)
-    user = relationship('User', uselist=False)
-
     __mapper_args__ = {
         'polymorphic_identity': 'member',
         'polymorphic_on': 'type'
@@ -38,7 +35,7 @@ class Group(Base):
     is_open = Column(Boolean, nullable=False)
     max_members = Column(Integer, nullable=False)
 
-    members = relationship('Member', back_populates='group', cascade='delete, delete-orphan')
+    members = relationship('Member', cascade='delete, delete-orphan')
 
     __mapper_args__ = {
         'polymorphic_identity': 'group',

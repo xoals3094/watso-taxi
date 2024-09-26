@@ -21,7 +21,7 @@ def from_json_to_entity(json):
 
 
 def test_participate_success():
-    taxi_group = from_json_to_entity(setup.participate_success)
+    taxi_group = from_json_to_entity(setup.taxi_group_1)
 
     user_id = 'user3'
     taxi_group.participate(user_id)

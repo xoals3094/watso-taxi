@@ -1,7 +1,7 @@
 from datetime import datetime, timedelta
 from webapp.domain.taxi_group.entity.taxi_group import TaxiGroup, TaxiGroupMember
 
-participate_success = {
+taxi_group_1 = {
     'cls': TaxiGroup,
     'id': 'test1',
     'owner_id': 'test-user1',

@@ -55,3 +55,12 @@ def test_participate_fail_max_members():
     with pytest.raises(domain.ParticipationFailed) as e:
         taxi_group.participate(user_id)
     assert str(e.value) == '최대 인원에 도달하여 참여 불가능합니다 2/2'
+
+
+def test_participate_fail_duplicate_member():
+    taxi_group = from_json_to_entity(setup.taxi_group_1)
+    user_id = taxi_group.members[1].user_id
+
+    with pytest.raises(domain.ParticipationFailed) as e:
+        taxi_group.participate(user_id)
+    assert str(e.value) == '이미 참여한 유저입니다'

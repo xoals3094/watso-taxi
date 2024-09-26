@@ -46,3 +46,12 @@ def test_participate_fail_not_open():
     with pytest.raises(domain.ParticipationFailed) as e:
         taxi_group.participate(user_id)
     assert str(e.value) == '참여가 마감된 그룹입니다 is_open=False'
+
+
+def test_participate_fail_max_members():
+    taxi_group = from_json_to_entity(setup.taxi_group_3)
+    user_id = 'test-user3'
+
+    with pytest.raises(domain.ParticipationFailed) as e:
+        taxi_group.participate(user_id)
+    assert str(e.value) == '최대 인원에 도달하여 참여 불가능합니다 2/2'

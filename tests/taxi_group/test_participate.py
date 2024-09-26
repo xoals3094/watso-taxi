@@ -21,7 +21,7 @@ def from_json_to_entity(json):
     return cls(**params)
 
 
-def test_participate_success():
+def test_success():
     taxi_group = from_json_to_entity(setup.taxi_group_1)
 
     user_id = 'user3'
@@ -30,7 +30,7 @@ def test_participate_success():
     assert user_id in [member.user_id for member in taxi_group.members]
 
 
-def test_participate_fail_owner_member():
+def test_fail_owner_member():
     taxi_group = from_json_to_entity(setup.taxi_group_1)
     user_id = taxi_group.owner_id
 
@@ -39,7 +39,7 @@ def test_participate_fail_owner_member():
     assert str(e.value) == '그룹장 유저는 참여가 불가능합니다'
 
 
-def test_participate_fail_not_open():
+def test_fail_not_open():
     taxi_group = from_json_to_entity(setup.taxi_group_2)
     user_id = 'test-user3'
 
@@ -48,7 +48,7 @@ def test_participate_fail_not_open():
     assert str(e.value) == '참여가 마감된 그룹입니다 is_open=False'
 
 
-def test_participate_fail_max_members():
+def test_fail_max_members():
     taxi_group = from_json_to_entity(setup.taxi_group_3)
     user_id = 'test-user3'
 
@@ -57,7 +57,7 @@ def test_participate_fail_max_members():
     assert str(e.value) == '최대 인원에 도달하여 참여 불가능합니다 2/2'
 
 
-def test_participate_fail_duplicate_member():
+def test_fail_duplicate_member():
     taxi_group = from_json_to_entity(setup.taxi_group_1)
     user_id = taxi_group.members[1].user_id
 

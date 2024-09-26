@@ -1,14 +1,17 @@
 import pytest
 from . import setup
-from webapp.domain.taxi_group.entity.taxi_group import TaxiGroup, TaxiGroupMember
 
 
-def from_json_to_entity(cls, json):
+def from_json_to_entity(json):
+    cls = json['cls']
     params = {}
     for name, value in json.items():
+        if name == 'cls':
+            continue
+
         if name == 'members':
             value = [
-                from_json_to_entity(TaxiGroupMember, member)
+                from_json_to_entity(member)
                 for member in value
             ]
 
@@ -18,7 +21,7 @@ def from_json_to_entity(cls, json):
 
 
 def test_participate_success():
-    taxi_group = from_json_to_entity(TaxiGroup, setup.participate_success)
+    taxi_group = from_json_to_entity(setup.participate_success)
 
     user_id = 'user3'
     taxi_group.participate(user_id)

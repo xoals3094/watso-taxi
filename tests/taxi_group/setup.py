@@ -4,7 +4,7 @@ from webapp.domain.taxi_group.entity.taxi_group import TaxiGroup, TaxiGroupMembe
 participate_success = {
     'cls': TaxiGroup,
     'id': 'test1',
-    'owner_id': 'owner_id',
+    'owner_id': 'test-user1',
     'is_open': True,
     'max_members': 4,
     'fare': 6000,

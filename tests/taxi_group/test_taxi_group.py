@@ -30,9 +30,9 @@ def test_participate_success():
     assert user_id in [member.user_id for member in taxi_group.members]
 
 
-def test_participate_fail_duplicate_member():
+def test_participate_fail_owner_member():
     taxi_group = from_json_to_entity(setup.taxi_group_1)
-    user_id = taxi_group.members[0].user_id
+    user_id = taxi_group.owner_id
 
     with pytest.raises(domain.ParticipationFailed) as e:
         taxi_group.participate(user_id)

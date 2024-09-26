@@ -1,6 +1,25 @@
 from datetime import datetime, timedelta
 from webapp.domain.taxi_group.entity.taxi_group import TaxiGroup, TaxiGroupMember
 
+
+def from_json_to_entity(json):
+    cls = json['cls']
+    params = {}
+    for name, value in json.items():
+        if name == 'cls':
+            continue
+
+        if name == 'members':
+            value = [
+                from_json_to_entity(member)
+                for member in value
+            ]
+
+        params[name] = value
+
+    return cls(**params)
+
+
 taxi_group_1 = {
     'cls': TaxiGroup,
     'id': 'test1',

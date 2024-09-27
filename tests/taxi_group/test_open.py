@@ -18,3 +18,11 @@ def test_fail_settle_to_open():
     with pytest.raises(domain.InvalidState) as e:
         taxi_group.open()
     assert str(e.value) == "'SETTLE' -> 'OPEN'는 허용되지 않는 상태코드 변경입니다."
+
+
+def test_fail_complete_to_open():
+    taxi_group = setup.from_json_to_entity(setup.taxi_group_complete)
+
+    with pytest.raises(domain.InvalidState) as e:
+        taxi_group.open()
+    assert str(e.value) == "'COMPLETE' -> 'OPEN'는 허용되지 않는 상태코드 변경입니다."

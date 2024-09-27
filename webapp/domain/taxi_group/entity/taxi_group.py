@@ -15,7 +15,7 @@ DEFAULT_TAXI_FARE = 6200
 class TaxiGroupMember(Member):
     __tablename__ = 'taxi_group_members'
 
-    id = Column(String(32), ForeignKey('members.id'), primary_key=True)
+    id = Column(String(32), ForeignKey('members.id', ondelete='CASCADE'), primary_key=True)
     cost = Column(Integer, nullable=False)
 
     __mapper_args__ = {
@@ -26,7 +26,7 @@ class TaxiGroupMember(Member):
 class TaxiGroup(Group):
     __tablename__ = 'taxi_groups'
 
-    id = Column(String(32), ForeignKey('groups.id'), primary_key=True)
+    id = Column(String(32), ForeignKey('groups.id', ondelete='CASCADE'), primary_key=True)
     fare = Column(Integer, nullable=False)
     status = Column(String(20), nullable=False)
     departure_datetime = Column(DateTime, nullable=False)

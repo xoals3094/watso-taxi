@@ -16,3 +16,4 @@ class GroupRepository(MySqlDatabase, metaclass=ABCMeta):
     def delete(self, group_id):
         stmt = delete(Group).filter_by(id=group_id)
         self.session.execute(stmt)
+        self.session.commit()

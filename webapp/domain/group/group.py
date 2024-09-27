@@ -16,7 +16,7 @@ class Member(Base):
 
     id = Column(String(32), primary_key=True)
     type = Column(String(20))
-    group_id = Column(String(32), ForeignKey('groups.id'))
+    group_id = Column(String(32), ForeignKey('groups.id', ondelete='CASCADE'))
     user_id = Column(String(32), ForeignKey('users.id'))
 
     __mapper_args__ = {
@@ -35,7 +35,7 @@ class Group(Base):
     is_open = Column(Boolean, nullable=False)
     max_members = Column(Integer, nullable=False)
 
-    members = relationship('Member', cascade='delete, delete-orphan')
+    members = relationship('Member', cascade='delete-orphan')
 
     __mapper_args__ = {
         'polymorphic_identity': 'group',

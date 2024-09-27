@@ -65,10 +65,10 @@ class Group(Base):
 
     def leave(self, user_id):
         if self.owner_id == user_id:
-            raise domain.ParticipationFailed(msg=f'그룹장 유저는 탈퇴가 불가능합니다')
+            raise domain.LeaveFailed(msg=f'그룹장 유저는 탈퇴가 불가능합니다')
 
         if self.is_open is False:
-            raise domain.ParticipationFailed(msg=f'탈퇴가 불가능한 그룹입니다 is_open={self.is_open}')
+            raise domain.LeaveFailed(msg=f'탈퇴가 불가능한 그룹입니다 is_open={self.is_open}')
 
         for group_member in self.members:
             if user_id == group_member.user_id:

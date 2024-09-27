@@ -16,11 +16,8 @@ class Member(Base):
 
     id = Column(String(32), primary_key=True)
     type = Column(String(20))
-    group_id = Column(String(32), ForeignKey('groups.id'))
+    group_id = Column(String(32), ForeignKey('groups.id', ondelete='CASCADE'))
     user_id = Column(String(32), ForeignKey('users.id'))
-
-    group = relationship('Group', back_populates='members', uselist=False)
-    user = relationship('User', uselist=False)
 
     __mapper_args__ = {
         'polymorphic_identity': 'member',
@@ -38,7 +35,7 @@ class Group(Base):
     is_open = Column(Boolean, nullable=False)
     max_members = Column(Integer, nullable=False)
 
-    members = relationship('Member', back_populates='group', cascade='delete, delete-orphan')
+    members = relationship('Member', cascade='delete-orphan')
 
     __mapper_args__ = {
         'polymorphic_identity': 'group',
@@ -68,10 +65,10 @@ class Group(Base):
 
     def leave(self, user_id):
         if self.owner_id == user_id:
-            raise domain.ParticipationFailed(msg=f'그룹장 유저는 탈퇴가 불가능합니다')
+            raise domain.LeaveFailed(msg=f'그룹장 유저는 탈퇴가 불가능합니다')
 
         if self.is_open is False:
-            raise domain.ParticipationFailed(msg=f'탈퇴가 불가능한 그룹입니다 is_open={self.is_open}')
+            raise domain.LeaveFailed(msg=f'탈퇴가 불가능한 그룹입니다 is_open={self.is_open}')
 
         for group_member in self.members:
             if user_id == group_member.user_id:

@@ -36,6 +36,7 @@ if not config.get_main_option("sqlalchemy.url"):
 # add your model's MetaData object here
 # for 'autogenerate' support
 # from myapp import mymodel
+from webapp.common.schema import models
 target_metadata = models.Base.metadata
 # target_metadata = None
 

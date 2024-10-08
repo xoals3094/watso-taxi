@@ -10,6 +10,8 @@ def test_success():
     taxi_group.participate(user_id)
 
     assert user_id in [member.user_id for member in taxi_group.members]
+    for member in taxi_group.members:
+        assert member.cost == 2000
 
 
 def test_fail_owner_member():

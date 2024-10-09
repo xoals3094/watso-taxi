@@ -216,6 +216,7 @@ async def leave(
 async def websocket_endpoint(
         group_id: str,
         token: str,
+        session_id: str,
         websocket: WebSocket,
         chat_service: ChatService = Depends(container.get_chat_service)
 ):
@@ -224,13 +225,18 @@ async def websocket_endpoint(
     except auth.TokenExpired:
         await websocket.close(1008, 'Unauthorized')
         return
-    await websocket.accept()
 
-    await chat_service.participate(group_id, user_id, websocket)
+    await websocket.accept()
+    await chat_service.connect(
+        group_id=group_id,
+        session_id=session_id,
+        websocket=websocket
+    )
+
     try:
         while True:
             data = await websocket.receive_json()
             content = data['content']
             await chat_service.send_message(group_id, user_id, content)
     except starlette.websockets.WebSocketDisconnect:
-        await chat_service.leave(group_id, user_id)
+        await chat_service.disconnect(group_id, user_id)

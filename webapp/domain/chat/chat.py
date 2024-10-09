@@ -1,4 +1,3 @@
-from fastapi import WebSocket
 from dataclasses import dataclass
 from datetime import datetime
 from webapp.common.util.id_generator import create_id
@@ -21,13 +20,13 @@ class Chat:
 
 
 @dataclass
-class MetaData(Chat):
-    users: list[dict] = None
-    type: str = "METADATA"
+class Pended(Chat):
+    type: str = "PENDED"
+    chats = list[Chat]
 
     @classmethod
-    def create(cls, users: list[dict]):
-        return Chat._create(cls, cls.type, users=users)
+    def create(cls, chats):
+        return Chat._create(cls, cls.type, chats=chats)
 
 
 @dataclass
@@ -60,23 +59,3 @@ class Exit(Chat):
     @classmethod
     def create(cls, user_id):
         return Chat._create(cls, cls.type, user_id=user_id)
-
-
-class Channel:
-    def __init__(self, group_id):
-        self.group_id = group_id
-        self.websockets: dict[str, WebSocket] = {}
-
-    def join(self, user_id: str, websocket: WebSocket):
-        self.websockets[user_id] = websocket
-
-    def quit(self, user_id):
-        self.websockets.pop(user_id)
-
-    async def send(self, chat: Chat):
-        for user_id, websocket in self.websockets.items():
-            await websocket.send_json(str(chat.__dict__))
-
-    @property
-    def member_ids(self) -> list[str]:
-        return [key for key in self.websockets.keys()]

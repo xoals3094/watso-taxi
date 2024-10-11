@@ -20,8 +20,8 @@ class Chat:
 
 
 @dataclass
-class Pended(Chat):
-    type: str = "PENDED"
+class Pending(Chat):
+    type: str = "PENDING"
     chats: list[Chat] = None
 
     @classmethod

@@ -1,5 +1,5 @@
 from fastapi import WebSocket
-from webapp.domain.chat.chat import Chat, Pended
+from webapp.domain.chat.chat import Chat, Pending
 
 
 class Session:
@@ -10,7 +10,7 @@ class Session:
 
     async def link(self, websocket: WebSocket):
         self.websocket = websocket
-        pended = Pended.create(chats=self.chat_queue)
+        pended = Pending.create(chats=self.chat_queue)
         await self.send(pended)
         self.chat_queue = []
 

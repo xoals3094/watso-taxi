@@ -22,7 +22,7 @@ class Chat:
 @dataclass
 class Pended(Chat):
     type: str = "PENDED"
-    chats = list[Chat]
+    chats: list[Chat] = None
 
     @classmethod
     def create(cls, chats):

@@ -239,4 +239,4 @@ async def websocket_endpoint(
             content = data['content']
             await chat_service.send_message(group_id, user_id, content)
     except starlette.websockets.WebSocketDisconnect:
-        await chat_service.disconnect(group_id, user_id)
+        await chat_service.disconnect(group_id=group_id, session_id=session_id)

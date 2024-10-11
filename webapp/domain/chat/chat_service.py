@@ -29,7 +29,7 @@ class ChatService:
         except persistence.ResourceNotFound:
             channel = self.channel_manager.create_channel(group_id)
 
-        channel.connect(session_id=session_id, websocket=websocket)
+        await channel.connect(session_id=session_id, websocket=websocket)
 
     async def disconnect(self, group_id: str, session_id: str):
         channel = self.channel_manager.get_channel(group_id)

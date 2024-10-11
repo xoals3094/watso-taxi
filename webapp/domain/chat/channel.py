@@ -10,8 +10,9 @@ class Session:
 
     async def link(self, websocket: WebSocket):
         self.websocket = websocket
-        pended = Pended.create(self.chat_queue)
+        pended = Pended.create(chats=self.chat_queue)
         await self.send(pended)
+        self.chat_queue = []
 
     def unlink(self):
         self.websocket = None
@@ -30,13 +31,13 @@ class Channel:
         self.group_id = group_id
         self.sessions: dict[str, Session] = {}
 
-    def connect(self, session_id: str, websocket: WebSocket):
+    async def connect(self, session_id: str, websocket: WebSocket):
         if session_id not in self.sessions:
             session = Session(id=session_id, websocket=websocket)
             self.sessions[session_id] = session
             return
 
-        self.sessions[session_id].link(websocket)
+        await self.sessions[session_id].link(websocket)
 
     def disconnect(self, session_id):
         self.sessions[session_id].unlink()

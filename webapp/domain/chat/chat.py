@@ -4,9 +4,23 @@ from webapp.common.util.id_generator import create_id
 
 
 @dataclass
-class Chat:
+class Base:
+    @property
+    def dict(self):
+        result = {}
+        for key, value in self.__dict__.items():
+            result[key] = value
+            if isinstance(value, list):
+                result[key] = [item.__dict__ for item in value]
+            elif isinstance(value, Base):
+                result[key] = value.__dict__
+        return result
+
+
+@dataclass
+class Chat(Base):
     id: str
-    timestamp: datetime
+    timestamp: str
     type: str = 'CHAT'
 
     @staticmethod
@@ -14,9 +28,28 @@ class Chat:
         return cls(
             id=create_id(),
             type=type,
-            timestamp=datetime.now(),
+            timestamp=datetime.now().strftime('%Y-%m-%dT%H:%M:%S'),
             **kwargs
         )
+
+
+@dataclass
+class User(Base):
+    id: str
+    nickname: str
+    profile_image_url: str
+
+
+@dataclass
+class Metadata(Chat):
+    type: str = "METADATA"
+    session_id: str = None
+    users: list[User] = None
+    chats: list[Chat] = None
+
+    @classmethod
+    def create(cls, session_id, users, chats):
+        return Chat._create(cls, cls.type, session_id=session_id, users=users, chats=chats)
 
 
 @dataclass

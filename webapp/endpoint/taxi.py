@@ -216,8 +216,8 @@ async def leave(
 async def websocket_endpoint(
         group_id: str,
         token: str,
-        session_id: str,
         websocket: WebSocket,
+        session_id: str = None,
         chat_service: ChatService = Depends(container.get_chat_service)
 ):
     try:
@@ -228,6 +228,7 @@ async def websocket_endpoint(
 
     await websocket.accept()
     await chat_service.connect(
+        user_id=user_id,
         group_id=group_id,
         session_id=session_id,
         websocket=websocket

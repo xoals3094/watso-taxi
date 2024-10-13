@@ -1,5 +1,5 @@
 from webapp.common.exceptions import persistence
-from webapp.domain.chat.chat import Channel
+from webapp.domain.chat.channel import Channel
 
 
 class ChannelManager:

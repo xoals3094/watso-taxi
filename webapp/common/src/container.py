@@ -13,6 +13,7 @@ from webapp.domain.user.persistance.user_repository import UserRepository
 from webapp.domain.user.application.user_service import UserService
 
 from webapp.domain.chat.chat_service import ChatService
+from webapp.domain.chat.chat_group_processor import ChatGroupProcessor
 from webapp.domain.chat.channel_manager import ChannelManager
 from webapp.domain.taxi_group.application.taxi_group_service import TaxiGroupService
 from webapp.domain.taxi_group.persistance.taxi_group_repository import TaxiGroupRepository
@@ -51,10 +52,7 @@ def get_session_context():
 
 
 def get_chat_service():
-    return ChatService(
-        channel_manager=channel_manager,
-        session_context=get_session_context
-    )
+    return ChatService(channel_manager=channel_manager)
 
 
 def get_kakao_repository(session=Depends(get_session)):
@@ -97,8 +95,15 @@ def get_kakao_auth_service(
     )
 
 
-def get_taxi_group_service(taxi_group_repository=Depends(get_taxi_group_repository)):
-    return TaxiGroupService(taxi_group_repository=taxi_group_repository)
+def get_chat_group_processor():
+    return ChatGroupProcessor(channel_manager=channel_manager, session_context=get_session_context)
+
+
+def get_taxi_group_service(
+        taxi_group_repository=Depends(get_taxi_group_repository),
+        chat_group_processor=Depends(get_chat_group_processor)
+):
+    return TaxiGroupService(taxi_group_repository=taxi_group_repository, chat_group_processor=chat_group_processor)
 
 
 def get_query_service(taxi_group_dao=Depends(get_taxi_group_dao)):

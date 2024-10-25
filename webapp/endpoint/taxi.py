@@ -196,7 +196,7 @@ async def participate(
         taxi_group_service: TaxiGroupService = Depends(container.get_taxi_group_service)
 ) -> None:
 
-    taxi_group_service.participate(group_id=group_id, user_id=user_id)
+    await taxi_group_service.participate(group_id=group_id, user_id=user_id)
 
 
 @taxi_router.delete(
@@ -209,7 +209,7 @@ async def leave(
         taxi_group_service: TaxiGroupService = Depends(container.get_taxi_group_service)
 ) -> None:
 
-    taxi_group_service.leave(group_id=group_id, user_id=user_id)
+    await taxi_group_service.leave(group_id=group_id, user_id=user_id)
 
 
 @taxi_router.websocket("/{group_id}")

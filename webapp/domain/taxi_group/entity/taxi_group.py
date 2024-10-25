@@ -100,8 +100,9 @@ class TaxiGroup(Group):
             direction: str,
             max_members: int
     ):
+        group_id = create_id()
         return TaxiGroup(
-            id=create_id(),
+            id=group_id,
             created_at=datetime.now(),
             owner_id=owner_id,
             is_open=True,

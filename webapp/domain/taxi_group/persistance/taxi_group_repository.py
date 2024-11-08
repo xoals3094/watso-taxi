@@ -16,6 +16,4 @@ class TaxiGroupRepository(GroupRepository):
         return taxi_group
 
     def save(self, taxi_group: TaxiGroup):
-        for member in taxi_group.members:
-            self.session.add(member)
         self.session.add(taxi_group)

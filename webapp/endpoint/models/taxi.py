@@ -26,13 +26,13 @@ class GroupId(BaseModel):
     group_id: str = Field(..., description='생성된 게시글 ID', examples=[create_id()])
 
 
-class FareUpdate(BaseModel):
-    class Member(BaseModel):
-        id: str = Field(..., description='유저 ID', examples=[create_id()])
+class SettleRequest(BaseModel):
+    class Bill(BaseModel):
+        user_id: str = Field(..., description='유저 ID', examples=[create_id()])
         cost: int = Field(..., description=' 비용', examples=[3000])
 
     fare: int = Field(..., description='비용', examples=[6200])
-    members: List[Member]
+    bills: List[Bill] = None
 
 
 class TaxiGroup(BaseModel):

@@ -51,7 +51,7 @@ class TaxiGroupService:
             self,
             group_id: str,
             fare: int,
-            user_costs: list[(str, int)] | None
+            user_costs: list[(str, int)] = None
     ):
         billing_policy = AutoBillingPolicy()
         if user_costs is not None:

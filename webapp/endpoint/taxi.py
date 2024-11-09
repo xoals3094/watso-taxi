@@ -18,7 +18,7 @@ from .models.taxi import (
     TaxiGroup,
     GroupQueryOption,
     Direction,
-    FareUpdate,
+    SettleRequest,
     FareDetail
 )
 
@@ -116,25 +116,6 @@ async def get_fare(
 
 
 @taxi_router.patch(
-    '/{group_id}/fare',
-    status_code=status.HTTP_204_NO_CONTENT,
-    dependencies=[Depends(owner_permission)],
-)
-async def update_fare(
-        group_id: str,
-        req: FareUpdate,
-        taxi_group_service: TaxiGroupService = Depends(container.get_taxi_group_service)
-) -> None:
-
-    members = [(member.id, member.cost) for member in req.members]
-    taxi_group_service.update_fare(
-        group_id=group_id,
-        fare=req.fare,
-        members=members
-    )
-
-
-@taxi_router.patch(
     '/{group_id}/open',
     status_code=status.HTTP_204_NO_CONTENT,
     dependencies=[Depends(owner_permission)],
@@ -167,10 +148,11 @@ async def close(
 )
 async def settle(
         group_id: str,
+        req: SettleRequest,
         taxi_group_service: TaxiGroupService = Depends(container.get_taxi_group_service)
 ) -> None:
-
-    taxi_group_service.settle(group_id=group_id)
+    user_costs = [(bill.user_id, bill.cost) for bill in req.bills] if req.bills is not None else None
+    taxi_group_service.settle(group_id=group_id, fare=req.fare, user_costs=user_costs)
 
 
 @taxi_router.patch(

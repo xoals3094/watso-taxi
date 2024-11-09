@@ -58,7 +58,7 @@ class Group(Base):
             if user_id == group_member.user_id:
                 raise domain.ParticipationFailed(msg='이미 참여한 유저입니다')
 
-        self.members.append(user_id)
+        self.members.append(Member(id=create_id(), group_id=self.id, user_id=user_id))
 
     def leave(self, user_id):
         if self.owner_id == user_id:

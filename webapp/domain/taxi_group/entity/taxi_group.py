@@ -34,7 +34,7 @@ class TaxiGroup(Group):
 
     def settle(self, fare: int, billing_policy: BillingPolicy) -> list[Bill]:
         self._set_status(Status.SETTLE)
-        bills = billing_policy.create_bills(fare, self.members)
+        bills = billing_policy.create_bills(str(self.id), fare, [member.user_id for member in self.members])
         return bills
 
     def complete(self):

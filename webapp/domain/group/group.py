@@ -20,6 +20,8 @@ class Member(Base):
     group_id = Column(String(32), ForeignKey('groups.id', ondelete='CASCADE'))
     user_id = Column(String(32), ForeignKey('users.id'))
 
+    group = relationship('Group', back_populates='members')
+
 
 class Group(Base):
     __tablename__ = 'groups'
@@ -31,7 +33,7 @@ class Group(Base):
     is_open = Column(Boolean, nullable=False)
     max_members = Column(Integer, nullable=False)
 
-    members = relationship('Member', cascade='delete')
+    members = relationship('Member', back_populates='group', cascade='all, delete-orphan')
 
     __mapper_args__ = {
         'polymorphic_identity': 'group',
@@ -75,14 +77,14 @@ class Group(Base):
 
     @staticmethod
     def _create(cls, owner_id, **kwargs):
-        group_id = create_id(),
+        group_id = create_id()
         return cls(
             id=group_id,
             owner_id=owner_id,
             created_at=datetime.now(),
             is_open=True,
             members=[
-                Member(id=create_id(), group_id=group_id, user_id=owner_id)
+                Member(id=create_id(), user_id=owner_id)
             ],
             **kwargs
         )

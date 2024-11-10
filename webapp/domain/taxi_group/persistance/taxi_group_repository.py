@@ -14,6 +14,3 @@ class TaxiGroupRepository(GroupRepository):
             raise persistence.ResourceNotFound
 
         return taxi_group
-
-    def save(self, taxi_group: TaxiGroup):
-        self.session.add(taxi_group)

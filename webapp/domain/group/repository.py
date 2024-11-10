@@ -9,9 +9,8 @@ class GroupRepository(MySqlDatabase, metaclass=ABCMeta):
     def find_by_id(self, group_id) -> Group:
         pass
 
-    @abstractmethod
     def save(self, group: Group):
-        pass
+        self.session.add(group)
 
     def delete(self, group_id):
         stmt = delete(Group).filter_by(id=group_id)

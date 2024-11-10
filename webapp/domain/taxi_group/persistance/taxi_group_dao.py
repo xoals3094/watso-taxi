@@ -1,8 +1,10 @@
 from sqlalchemy.orm import joinedload
 from sqlalchemy import select
 from datetime import datetime, timedelta
+from webapp.domain.user.entity.user import User
 from webapp.domain.group.group import Group, Member
 from webapp.domain.taxi_group.persistance.taxi_group_repository import TaxiGroupRepository
+from webapp.domain.taxi_group.entity.bill import Bill
 from webapp.domain.taxi_group.entity.taxi_group import TaxiGroup
 from webapp.domain.taxi_group.entity.status import Status
 
@@ -70,20 +72,18 @@ class TaxiGroupDao(TaxiGroupRepository):
 
         return taxi_groups
 
-    # def find_fare(self, group_id: str):
-    #     stmt = select(TaxiGroup.fare).where(TaxiGroup.id == group_id)
-    #     result = self.session.execute(stmt)
-    #     fare = result.scalar_one()
-    #
-    #     stmt = select(
-    #         TaxiGroupMember.user_id,
-    #         TaxiGroupMember.user.nickname,
-    #         TaxiGroupMember.cost
-    #     ).join(
-    #         TaxiGroupMember.user
-    #     ).where(
-    #         TaxiGroupMember.group_id == group_id
-    #     )
-    #     members = self.session.execute(stmt)
-    #
-    #     return fare, tuple(members)
+    def find_fare(self, group_id: str):
+        stmt = select(
+            User.id,
+            User.nickname,
+            Bill.cost
+        ).join(
+            Bill
+        ).where(
+            Bill.group_id == group_id
+        )
+        members = tuple(self.session.execute(stmt))
+        fare = 0
+        for member in members:
+            fare += member.cost
+        return fare, members

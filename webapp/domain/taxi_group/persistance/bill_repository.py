@@ -3,6 +3,5 @@ from webapp.domain.taxi_group.entity.bill import Bill
 
 
 class BillRepository(MySqlDatabase):
-    def save(self, bills: list[Bill]):
-        for bill in bills:
-            self.session.add(bill)
+    def save(self, bill: Bill):
+        self.session.add(bill)

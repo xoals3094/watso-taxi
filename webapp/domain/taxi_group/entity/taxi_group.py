@@ -32,10 +32,10 @@ class TaxiGroup(Group):
         super(TaxiGroup, self).close()
         self._set_status(Status.CLOSE)
 
-    def settle(self, fare: int, billing_policy: BillingPolicy) -> list[Bill]:
+    def settle(self, fare: int, billing_policy: BillingPolicy) -> Bill:
         self._set_status(Status.SETTLE)
-        bills = billing_policy.create_bills(str(self.id), fare, [member.user_id for member in self.members])
-        return bills
+        bill = billing_policy.create_bills(str(self.id), fare, [member.user_id for member in self.members])
+        return bill
 
     def complete(self):
         self._set_status(Status.COMPLETE)

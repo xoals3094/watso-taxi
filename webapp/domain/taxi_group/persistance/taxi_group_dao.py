@@ -4,7 +4,7 @@ from datetime import datetime, timedelta
 from webapp.domain.user.entity.user import User
 from webapp.domain.group.group import Group, Member
 from webapp.domain.taxi_group.persistance.taxi_group_repository import TaxiGroupRepository
-from webapp.domain.taxi_group.entity.bill import Bill
+from webapp.domain.taxi_group.entity.bill import Bill, Charge
 from webapp.domain.taxi_group.entity.taxi_group import TaxiGroup
 from webapp.domain.taxi_group.entity.status import Status
 
@@ -73,17 +73,17 @@ class TaxiGroupDao(TaxiGroupRepository):
         return taxi_groups
 
     def find_fare(self, group_id: str):
-        stmt = select(
-            User.id,
-            User.nickname,
-            Bill.cost
-        ).join(
-            Bill
-        ).where(
+        stmt = select(Bill).where(
             Bill.group_id == group_id
         )
+        bill = self.session.execute(stmt).scalars().first()
+        fare = bill.fee
+
+        stmt = select(
+            Charge.user_id,
+            User.nickname,
+            Charge.cost
+        ).join(User).where(Charge.bill_id == bill.id)
+
         members = tuple(self.session.execute(stmt))
-        fare = 0
-        for member in members:
-            fare += member.cost
         return fare, members

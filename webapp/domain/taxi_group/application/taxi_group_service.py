@@ -53,11 +53,12 @@ class TaxiGroupService:
             fare: int,
             user_costs: list[(str, int)] = None
     ):
-        billing_policy = AutoBillingPolicy()
+        taxi_group = self.taxi_group_repository.find_by_id(group_id)
+
+        billing_policy = AutoBillingPolicy(taxi_group.owner_id)
         if user_costs is not None:
             billing_policy = CustomBillingPolicy(user_costs)
 
-        taxi_group = self.taxi_group_repository.find_by_id(group_id)
         bills = taxi_group.settle(fare, billing_policy)
         self.taxi_group_repository.save(taxi_group)
         self.bill_repository.save(bills)

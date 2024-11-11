@@ -11,6 +11,9 @@ class BillingPolicy(metaclass=ABCMeta):
 
 
 class AutoBillingPolicy(BillingPolicy):
+    def __init__(self, owner_id: str):
+        self.owner_id = owner_id
+
     def create_bills(self, group_id: str, fare: int, members: list[str]) -> list[Bill]:
         cost = int(fare / len(members))
         if fare % len(members) == 0:
@@ -28,21 +31,16 @@ class AutoBillingPolicy(BillingPolicy):
         owner_cost = cost - (len(members) - rest_cost - 1)
         cost = cost + 1
 
-        owner_id = members[0]
-        bills = [Bill(
-            id=create_id(),
-            group_id=group_id,
-            user_id=owner_id,
-            cost=owner_cost)
+        bills = [
         ]
-        for member_id in members[1:]:
-            bills.append(
-                Bill(
-                    id=create_id(),
-                    group_id=group_id,
-                    user_id=member_id,
-                    cost=cost)
+        for member_id in members:
+            bill = Bill(
+                id=create_id(),
+                group_id=group_id,
+                user_id=member_id,
+                cost=owner_cost if member_id == self.owner_id else cost
             )
+            bills.append(bill)
 
         return bills
 

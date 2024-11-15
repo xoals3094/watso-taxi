@@ -3,7 +3,6 @@ from datetime import datetime
 from typing import List
 from enum import Enum
 from webapp.common.util.id_generator import create_id
-from webapp.domain.taxi_group.entity.taxi_group import TaxiGroup as TaxiGroupDomain
 
 
 class GroupQueryOption(str, Enum):
@@ -26,16 +25,16 @@ class GroupId(BaseModel):
     group_id: str = Field(..., description='생성된 게시글 ID', examples=[create_id()])
 
 
-class FareUpdate(BaseModel):
-    class Member(BaseModel):
-        id: str = Field(..., description='유저 ID', examples=[create_id()])
+class SettleRequest(BaseModel):
+    class Bill(BaseModel):
+        user_id: str = Field(..., description='유저 ID', examples=[create_id()])
         cost: int = Field(..., description=' 비용', examples=[3000])
 
     fare: int = Field(..., description='비용', examples=[6200])
-    members: List[Member]
+    bills: List[Bill] = None
 
 
-class TaxiGroup(BaseModel):
+class TaxiGroupDetail(BaseModel):
     class Fare(BaseModel):
         fare: int = Field(..., description='총합', examples=['6200'])
         cost: int = Field(..., description='비용', examples=['3100'])
@@ -53,29 +52,56 @@ class TaxiGroup(BaseModel):
     member: Member
 
     @staticmethod
-    def mapping(user_id, taxi_group: TaxiGroupDomain):
-        member = next((member for member in taxi_group.members if member.user_id == user_id), None)
-        role = 'NON_MEMBER'
-        if member:
-            role = "OWNER" if taxi_group.owner_id == user_id else 'MEMBER'
-
-        cost = taxi_group.fare // (len(taxi_group.members) + 1)
-        if member:
-            cost = member.cost
-
-        taxi_group = TaxiGroup(
-            id=taxi_group.id,
+    def mapping(id, role, status, direction, departure_datetime, fare, cost, current_members, max_members):
+        taxi_group = TaxiGroupDetail(
+            id=id,
             role=role,
-            status=taxi_group.status,
-            direction=taxi_group.direction,
-            departure_datetime=taxi_group.departure_datetime,
-            fare=TaxiGroup.Fare(
-                fare=taxi_group.fare,
+            status=status,
+            direction=direction,
+            departure_datetime=departure_datetime,
+            fare=TaxiGroupDetail.Fare(
+                fare=fare,
                 cost=cost
             ),
-            member=TaxiGroup.Member(
-                current_members=len(taxi_group.members),
-                max_members=taxi_group.max_members
+            member=TaxiGroupDetail.Member(
+                current_members=current_members,
+                max_members=max_members
+            )
+        )
+
+        return taxi_group
+
+
+class TaxiGroupSummary(BaseModel):
+    class Fare(BaseModel):
+        fare: int = Field(..., description='총합', examples=['6200'])
+        cost: int = Field(..., description='비용', examples=['3100'])
+
+    class Member(BaseModel):
+        current_members: int = Field(..., description='현재 인원', examples=[1])
+        max_members: int = Field(..., description='최대 인원', examples=[4])
+
+    id: str = Field(..., description='그룹 ID', examples=[create_id()])
+    status: str = Field(..., description='상태 코드', examples=['OPEN', 'CLOSE', 'SETTLE', 'COMPLETE'])
+    direction: Direction
+    departure_datetime: datetime = Field(..., description='출발 시간', examples=[datetime.now().strftime('%Y-%m-%dT%H:%M:%S')])
+    fare: Fare
+    member: Member
+
+    @staticmethod
+    def mapping(id, status, direction, departure_datetime, fare, cost, current_members, max_members):
+        taxi_group = TaxiGroupSummary(
+            id=id,
+            status=status,
+            direction=direction,
+            departure_datetime=departure_datetime,
+            fare=TaxiGroupSummary.Fare(
+                fare=fare,
+                cost=cost
+            ),
+            member=TaxiGroupSummary.Member(
+                current_members=current_members,
+                max_members=max_members
             )
         )
 

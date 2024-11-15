@@ -19,6 +19,7 @@ from webapp.domain.taxi_group.application.taxi_group_service import TaxiGroupSer
 from webapp.domain.taxi_group.persistance.taxi_group_repository import TaxiGroupRepository
 from webapp.domain.taxi_group.application.query_service import QueryService
 from webapp.domain.taxi_group.persistance.taxi_group_dao import TaxiGroupDao
+from webapp.domain.taxi_group.persistance.bill_repository import BillRepository
 
 
 channel_manager = ChannelManager()
@@ -71,6 +72,10 @@ def get_taxi_group_repository(session=Depends(get_session)):
     return TaxiGroupRepository(session=session)
 
 
+def get_bill_repository(session=Depends(get_session)):
+    return BillRepository(session=session)
+
+
 def get_taxi_group_dao(session=Depends(get_session)):
     return TaxiGroupDao(session=session)
 
@@ -100,10 +105,15 @@ def get_chat_group_processor():
 
 
 def get_taxi_group_service(
+        bill_repository=Depends(get_bill_repository),
         taxi_group_repository=Depends(get_taxi_group_repository),
         chat_group_processor=Depends(get_chat_group_processor)
 ):
-    return TaxiGroupService(taxi_group_repository=taxi_group_repository, chat_group_processor=chat_group_processor)
+    return TaxiGroupService(
+        bill_repository=bill_repository,
+        taxi_group_repository=taxi_group_repository,
+        chat_group_processor=chat_group_processor
+    )
 
 
 def get_query_service(taxi_group_dao=Depends(get_taxi_group_dao)):

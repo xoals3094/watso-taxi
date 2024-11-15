@@ -15,7 +15,8 @@ from webapp.domain.chat.chat_service import ChatService
 from .models.taxi import (
     TaxiGroupCreate,
     GroupId,
-    TaxiGroup,
+    TaxiGroupDetail,
+    TaxiGroupSummary,
     GroupQueryOption,
     Direction,
     SettleRequest,
@@ -48,7 +49,7 @@ async def create_taxi_group(
 
 @taxi_router.get(
     '',
-    response_model=list[TaxiGroup]
+    response_model=list[TaxiGroupSummary]
 )
 async def get_taxi_groups(
         option: GroupQueryOption = Query(..., description='조회 옵션'),
@@ -56,7 +57,7 @@ async def get_taxi_groups(
         departure_datetime: datetime = Query(datetime.now(), description='조회할 방향'),
         user_id: str = Depends(get_user_id),
         query_service: QueryService = Depends(container.get_query_service)
-) -> list[TaxiGroup]:
+) -> list[TaxiGroupSummary]:
 
     groups = query_service.get_taxi_group_list(option, direction, user_id, departure_datetime)
     return groups
@@ -64,12 +65,12 @@ async def get_taxi_groups(
 
 @taxi_router.get(
     '/history',
-    response_model=list[TaxiGroup]
+    response_model=list[TaxiGroupSummary]
 )
 async def get_taxi_group_history(
         user_id: str = Depends(get_user_id),
         query_service: QueryService = Depends(container.get_query_service)
-) -> list[TaxiGroup]:
+) -> list[TaxiGroupSummary]:
 
     groups = query_service.get_history(user_id)
     return groups
@@ -77,13 +78,13 @@ async def get_taxi_group_history(
 
 @taxi_router.get(
     '/{group_id}',
-    response_model=TaxiGroup
+    response_model=TaxiGroupDetail
 )
 async def get_taxi_group_detail(
         group_id: str,
         user_id: str = Depends(get_user_id),
         query_service: QueryService = Depends(container.get_query_service)
-) -> TaxiGroup:
+) -> TaxiGroupDetail:
 
     group = query_service.get_taxi_group(group_id=group_id, user_id=user_id)
     return group

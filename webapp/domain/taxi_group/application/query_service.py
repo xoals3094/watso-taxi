@@ -1,11 +1,14 @@
 from datetime import datetime
 from webapp.domain.taxi_group.persistance.taxi_group_dao import TaxiGroupDao
 from webapp.endpoint.models.taxi import (
-    TaxiGroup,
+    TaxiGroupDetail,
+    TaxiGroupSummary,
     GroupQueryOption,
     Direction,
     FareDetail
 )
+
+DEFAULT_FARE = 8300
 
 
 class QueryService:
@@ -16,9 +19,20 @@ class QueryService:
             self,
             group_id: str,
             user_id: str
-    ) -> TaxiGroup:
-        taxi_group = self.taxi_group_dao.find_by_id(group_id)
-        return TaxiGroup.mapping(user_id, taxi_group)
+    ) -> TaxiGroupDetail:
+
+        id, role, current_member, max_members, status, departure_datetime, direction, fee, cost = self.taxi_group_dao.find_taxi_group_detail_by_id(user_id, group_id)
+        return TaxiGroupDetail.mapping(
+            id=id,
+            role=role,
+            status=status,
+            direction=direction,
+            departure_datetime=departure_datetime,
+            current_members=current_member,
+            max_members=max_members,
+            fare=fee if fee is not None else DEFAULT_FARE,
+            cost=cost if cost is not None else DEFAULT_FARE // current_member
+        )
 
     def get_taxi_group_list(
             self,
@@ -26,29 +40,56 @@ class QueryService:
             direction: Direction,
             user_id: str,
             departure_datetime: datetime
-    ) -> list[TaxiGroup]:
+    ) -> list[TaxiGroupSummary]:
 
         results = []
         if option == GroupQueryOption.JOINED:
             taxi_groups = self.taxi_group_dao.find_joined(user_id, departure_datetime)
-            for taxi_group in taxi_groups:
-                taxi_group = TaxiGroup.mapping(user_id=user_id, taxi_group=taxi_group)
+            for id, current_member, max_members, status, departure_datetime, direction, fee, cost in taxi_groups:
+                taxi_group = TaxiGroupSummary.mapping(
+                    id=id,
+                    current_members=current_member,
+                    max_members=max_members,
+                    status=status,
+                    departure_datetime=departure_datetime,
+                    direction=direction,
+                    fare=fee if fee is not None else DEFAULT_FARE,
+                    cost=cost if cost is not None else DEFAULT_FARE // current_member
+                )
                 results.append(taxi_group)
 
         elif option == GroupQueryOption.JOINABLE:
             taxi_groups = self.taxi_group_dao.find_joinable(user_id, direction, departure_datetime)
-            for taxi_group in taxi_groups:
-                taxi_group = TaxiGroup.mapping(user_id=user_id, taxi_group=taxi_group)
+            for id, current_member, max_members, status, departure_datetime, direction in taxi_groups:
+                taxi_group = TaxiGroupSummary.mapping(
+                    id=id,
+                    current_members=current_member,
+                    max_members=max_members,
+                    status=status,
+                    departure_datetime=departure_datetime,
+                    direction=direction,
+                    fare=DEFAULT_FARE,
+                    cost=DEFAULT_FARE // (current_member + 1)
+                )
                 results.append(taxi_group)
 
         return results
 
-    def get_history(self, user_id) -> list[TaxiGroup]:
+    def get_history(self, user_id) -> list[TaxiGroupSummary]:
         taxi_groups = self.taxi_group_dao.find_complete(user_id)
 
         results = []
-        for taxi_group in taxi_groups:
-            taxi_group = TaxiGroup.mapping(user_id=user_id, taxi_group=taxi_group)
+        for id, current_member, max_members, status, departure_datetime, direction, fee, cost in taxi_groups:
+            taxi_group = TaxiGroupSummary.mapping(
+                id=id,
+                current_members=current_member,
+                max_members=max_members,
+                status=status,
+                departure_datetime=departure_datetime,
+                direction=direction,
+                fare=fee,
+                cost=cost
+            )
             results.append(taxi_group)
 
         return results

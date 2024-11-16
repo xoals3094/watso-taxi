@@ -11,6 +11,7 @@ from webapp.domain.auth.application.kakao_auth_service import KakaoAuthService
 
 from webapp.domain.user.persistance.user_repository import UserRepository
 from webapp.domain.user.application.user_service import UserService
+from webapp.domain.user.persistance.device_repository import DeviceRepository
 
 from webapp.domain.chat.chat_service import ChatService
 from webapp.domain.chat.chat_group_processor import ChatGroupProcessor
@@ -70,6 +71,10 @@ def get_user_repository(session=Depends(get_session)):
     return UserRepository(session=session)
 
 
+def get_device_repository(session=Depends(get_session)):
+    return DeviceRepository(session=session)
+
+
 def get_taxi_group_repository(session=Depends(get_session)):
     return TaxiGroupRepository(session=session)
 
@@ -93,12 +98,14 @@ def get_jwt_auth_service(token_repository=Depends(get_token_repository)):
 def get_kakao_auth_service(
         user_service=Depends(get_user_service),
         jwt_auth_service=Depends(get_jwt_auth_service),
-        kakao_repository=Depends(get_kakao_repository)
+        kakao_repository=Depends(get_kakao_repository),
+        device_repository=Depends(get_device_repository)
 ):
     return KakaoAuthService(
         user_service=user_service,
         jwt_auth_service=jwt_auth_service,
-        kakao_repository=kakao_repository
+        kakao_repository=kakao_repository,
+        device_repository=device_repository
     )
 
 

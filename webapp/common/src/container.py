@@ -15,6 +15,8 @@ from webapp.domain.user.application.user_service import UserService
 from webapp.domain.chat.chat_service import ChatService
 from webapp.domain.chat.chat_group_processor import ChatGroupProcessor
 from webapp.domain.chat.channel_manager import ChannelManager
+from webapp.domain.taxi_group.application.taxi_group_fcm_processor import TaxiGroupFCMProcessor
+from webapp.domain.taxi_group.persistance.device_dao import DeviceDao
 from webapp.domain.taxi_group.application.taxi_group_service import TaxiGroupService
 from webapp.domain.taxi_group.persistance.taxi_group_repository import TaxiGroupRepository
 from webapp.domain.taxi_group.application.query_service import QueryService
@@ -104,15 +106,25 @@ def get_chat_group_processor():
     return ChatGroupProcessor(channel_manager=channel_manager, session_context=get_session_context)
 
 
+def get_device_dao(session=Depends(get_session)):
+    return DeviceDao(session=session)
+
+
+def get_taxi_group_fcm_processor(device_dao=Depends(get_device_dao)):
+    return TaxiGroupFCMProcessor(device_dao=device_dao)
+
+
 def get_taxi_group_service(
         bill_repository=Depends(get_bill_repository),
         taxi_group_repository=Depends(get_taxi_group_repository),
-        chat_group_processor=Depends(get_chat_group_processor)
+        chat_group_processor=Depends(get_chat_group_processor),
+        taxi_group_fcm_processor=Depends(get_taxi_group_fcm_processor)
 ):
     return TaxiGroupService(
         bill_repository=bill_repository,
         taxi_group_repository=taxi_group_repository,
-        chat_group_processor=chat_group_processor
+        chat_group_processor=chat_group_processor,
+        taxi_group_fcm_processor=taxi_group_fcm_processor
     )
 
 

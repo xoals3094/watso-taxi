@@ -2,6 +2,7 @@ from datetime import datetime
 from webapp.domain.taxi_group.entity.taxi_group import TaxiGroup
 from webapp.domain.taxi_group.entity.billing_policy import AutoBillingPolicy, CustomBillingPolicy
 from webapp.domain.chat.chat_group_processor import ChatGroupProcessor
+from webapp.domain.taxi_group.application.taxi_group_fcm_processor import TaxiGroupFCMProcessor
 from webapp.domain.taxi_group.persistance.taxi_group_repository import TaxiGroupRepository
 from webapp.domain.taxi_group.persistance.bill_repository import BillRepository
 
@@ -10,10 +11,12 @@ class TaxiGroupService:
     def __init__(
             self,
             chat_group_processor: ChatGroupProcessor,
+            taxi_group_fcm_processor: TaxiGroupFCMProcessor,
             taxi_group_repository: TaxiGroupRepository,
             bill_repository: BillRepository
     ):
         self.chat_group_processor = chat_group_processor
+        self.taxi_group_fcm_processor = taxi_group_fcm_processor
         self.taxi_group_repository = taxi_group_repository
         self.bill_repository = bill_repository
 
@@ -63,10 +66,13 @@ class TaxiGroupService:
         self.taxi_group_repository.save(taxi_group)
         self.bill_repository.save(bill)
 
+        self.taxi_group_fcm_processor.settle(group_id, users=[member.user_id for member in taxi_group.members])
+
     def complete(self, group_id: str):
         taxi_group = self.taxi_group_repository.find_by_id(group_id)
         taxi_group.complete()
         self.taxi_group_repository.save(taxi_group)
+        self.taxi_group_fcm_processor.complete(group_id, users=[member.user_id for member in taxi_group.members])
 
     async def participate(self, group_id: str, user_id: str):
         taxi_group = self.taxi_group_repository.find_by_id(group_id)

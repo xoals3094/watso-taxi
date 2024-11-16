@@ -4,8 +4,10 @@ from webapp.domain.auth.application.kakao_auth_service import KakaoAuthService
 from webapp.common.src import container
 
 from .models.auth import (
+    LoginRequest,
     TokenPair,
-    RefreshToken
+    RefreshToken,
+    RefreshRequest
 )
 
 
@@ -29,27 +31,27 @@ async def logout(
     response_model=TokenPair,
 )
 async def refresh(
-        req: RefreshToken,
+        req: RefreshRequest,
         auth_service: JWTAuthService = Depends(container.get_jwt_auth_service)
 ) -> TokenPair:
 
-    access_token, refresh_token = auth_service.refresh(req.refresh_token)
+    access_token, refresh_token = auth_service.refresh(req.refresh_token, req.fcm_token)
     return TokenPair(
         access_token=access_token,
         refresh_token=refresh_token
     )
 
 
-@auth_router.get(
+@auth_router.post(
     '/login/kakao',
     response_model=TokenPair
 )
 async def kakao_login(
-        code: str,
+        req: LoginRequest,
         auth_service: KakaoAuthService = Depends(container.get_kakao_auth_service)
 ) -> TokenPair:
 
-    access_token, refresh_token = auth_service.login(code)
+    access_token, refresh_token = auth_service.login(req.code, req.fcm_token)
     return TokenPair(
         access_token=access_token,
         refresh_token=refresh_token

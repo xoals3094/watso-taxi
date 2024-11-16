@@ -11,10 +11,13 @@ from webapp.domain.auth.application.kakao_auth_service import KakaoAuthService
 
 from webapp.domain.user.persistance.user_repository import UserRepository
 from webapp.domain.user.application.user_service import UserService
+from webapp.domain.user.persistance.device_repository import DeviceRepository
 
 from webapp.domain.chat.chat_service import ChatService
 from webapp.domain.chat.chat_group_processor import ChatGroupProcessor
 from webapp.domain.chat.channel_manager import ChannelManager
+from webapp.domain.taxi_group.application.taxi_group_fcm_processor import TaxiGroupFCMProcessor
+from webapp.domain.taxi_group.persistance.device_dao import DeviceDao
 from webapp.domain.taxi_group.application.taxi_group_service import TaxiGroupService
 from webapp.domain.taxi_group.persistance.taxi_group_repository import TaxiGroupRepository
 from webapp.domain.taxi_group.application.query_service import QueryService
@@ -68,6 +71,10 @@ def get_user_repository(session=Depends(get_session)):
     return UserRepository(session=session)
 
 
+def get_device_repository(session=Depends(get_session)):
+    return DeviceRepository(session=session)
+
+
 def get_taxi_group_repository(session=Depends(get_session)):
     return TaxiGroupRepository(session=session)
 
@@ -91,12 +98,14 @@ def get_jwt_auth_service(token_repository=Depends(get_token_repository)):
 def get_kakao_auth_service(
         user_service=Depends(get_user_service),
         jwt_auth_service=Depends(get_jwt_auth_service),
-        kakao_repository=Depends(get_kakao_repository)
+        kakao_repository=Depends(get_kakao_repository),
+        device_repository=Depends(get_device_repository)
 ):
     return KakaoAuthService(
         user_service=user_service,
         jwt_auth_service=jwt_auth_service,
-        kakao_repository=kakao_repository
+        kakao_repository=kakao_repository,
+        device_repository=device_repository
     )
 
 
@@ -104,15 +113,25 @@ def get_chat_group_processor():
     return ChatGroupProcessor(channel_manager=channel_manager, session_context=get_session_context)
 
 
+def get_device_dao(session=Depends(get_session)):
+    return DeviceDao(session=session)
+
+
+def get_taxi_group_fcm_processor(device_dao=Depends(get_device_dao)):
+    return TaxiGroupFCMProcessor(device_dao=device_dao)
+
+
 def get_taxi_group_service(
         bill_repository=Depends(get_bill_repository),
         taxi_group_repository=Depends(get_taxi_group_repository),
-        chat_group_processor=Depends(get_chat_group_processor)
+        chat_group_processor=Depends(get_chat_group_processor),
+        taxi_group_fcm_processor=Depends(get_taxi_group_fcm_processor)
 ):
     return TaxiGroupService(
         bill_repository=bill_repository,
         taxi_group_repository=taxi_group_repository,
-        chat_group_processor=chat_group_processor
+        chat_group_processor=chat_group_processor,
+        taxi_group_fcm_processor=taxi_group_fcm_processor
     )
 
 

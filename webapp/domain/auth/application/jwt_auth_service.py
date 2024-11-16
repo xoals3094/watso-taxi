@@ -5,7 +5,7 @@ from webapp.domain.auth.persistance.token_repository import TokenRepository
 
 
 class JWTAuthService:
-    def __init__(self, token_repository: TokenRepository):
+    def __init__(self, token_repository: TokenRepository, ):
         self.token_repository = token_repository
 
     def login(self, user_id: str) -> (str, str):
@@ -20,7 +20,7 @@ class JWTAuthService:
         token_id, exp = get_token_id_and_exp(refresh_token)
         self.token_repository.delete(token_id)
 
-    def refresh(self, refresh_token) -> (str, str):
+    def refresh(self, refresh_token, fcm_token) -> (str, str):
         token_id, exp = get_token_id_and_exp(refresh_token)
 
         try:
@@ -29,6 +29,7 @@ class JWTAuthService:
             raise auth.LoginFail(msg='로그인 정보가 없습니다')
 
         token.refresh(exp)
+        token.user.device.fcm_token = fcm_token
         self.token_repository.save(token)
 
         return (

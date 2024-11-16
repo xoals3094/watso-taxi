@@ -6,7 +6,8 @@ from webapp.common.src import container
 from .models.auth import (
     LoginRequest,
     TokenPair,
-    RefreshToken
+    RefreshToken,
+    RefreshRequest
 )
 
 
@@ -30,11 +31,11 @@ async def logout(
     response_model=TokenPair,
 )
 async def refresh(
-        req: RefreshToken,
+        req: RefreshRequest,
         auth_service: JWTAuthService = Depends(container.get_jwt_auth_service)
 ) -> TokenPair:
 
-    access_token, refresh_token = auth_service.refresh(req.refresh_token)
+    access_token, refresh_token = auth_service.refresh(req.refresh_token, req.fcm_token)
     return TokenPair(
         access_token=access_token,
         refresh_token=refresh_token

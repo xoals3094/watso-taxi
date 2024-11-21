@@ -2,7 +2,8 @@
 
 부산대학교 밀양캠퍼스는 시내로부터 약 7~8분(5.1km) 떨어진 먼 거리에 위치하고 있습니다. 외진 곳에 위치하여 자차가 없는 경우 이동 수단이 버스와 택시로 한정됩니다. 하지만 배차시간이 일정하지 않은 버스와, 시외 할증으로 비싼 택시 요금은 고스란히 학생들의 부담으로 이어집니다.
 
-![Untitled](https://s3-us-west-2.amazonaws.com/secure.notion-static.com/937f4730-327b-46c3-b173-c0662ddb1a12/Untitled.png)
+![image](https://github.com/user-attachments/assets/0c0defcc-7963-4081-9e5d-fec4dc01ba26)
+
 
 학생들 사이에서는 불편함을 해결하기 위해 카톡방을 만들고 비슷한 시간대에 함께 택시를 타거나 배달을 이용할 사람을 모으고, 비용을 나누기 시작했습니다.
 

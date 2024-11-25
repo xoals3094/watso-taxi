@@ -9,7 +9,7 @@ class Device(Base):
 
     id = Column(String(32), primary_key=True)
     user_id = Column(String(32), ForeignKey('users.id'))
-    fcm_token = Column(String(32), nullable=True)
+    fcm_token = Column(String(200), nullable=True)
     allow_notification = Column(Boolean, nullable=False)
 
     user = relationship('User', back_populates='device', uselist=False)

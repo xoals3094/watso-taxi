@@ -74,7 +74,7 @@ class TaxiGroupDetail(BaseModel):
 
 class TaxiGroupSummary(BaseModel):
     class Fare(BaseModel):
-        fare: int = Field(..., description='총합', examples=['6200'])
+        total: int = Field(..., description='총합', examples=['6200'])
         cost: int = Field(..., description='비용', examples=['3100'])
 
     class Member(BaseModel):
@@ -96,7 +96,7 @@ class TaxiGroupSummary(BaseModel):
             direction=direction,
             departure_datetime=departure_datetime,
             fare=TaxiGroupSummary.Fare(
-                fare=fare,
+                total=fare,
                 cost=cost
             ),
             member=TaxiGroupSummary.Member(

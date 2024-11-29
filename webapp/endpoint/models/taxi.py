@@ -36,7 +36,7 @@ class SettleRequest(BaseModel):
 
 class TaxiGroupDetail(BaseModel):
     class Fare(BaseModel):
-        fare: int = Field(..., description='총합', examples=['6200'])
+        total: int = Field(..., description='총합', examples=['6200'])
         cost: int = Field(..., description='비용', examples=['3100'])
 
     class Member(BaseModel):
@@ -60,7 +60,7 @@ class TaxiGroupDetail(BaseModel):
             direction=direction,
             departure_datetime=departure_datetime,
             fare=TaxiGroupDetail.Fare(
-                fare=fare,
+                total=fare,
                 cost=cost
             ),
             member=TaxiGroupDetail.Member(
